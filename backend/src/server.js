@@ -1,4 +1,8 @@
-require('dotenv').config();
+// Load .env file only in development (Docker provides env vars in production)
+if (process.env.NODE_ENV !== 'production' || !process.env.DB_HOST) {
+  require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
+}
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
