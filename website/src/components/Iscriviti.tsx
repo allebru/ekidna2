@@ -4,6 +4,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Checkbox } from './ui/checkbox';
+import { submitSubscription } from '../config/api';
 
 export function Iscriviti() {
   const [formData, setFormData] = useState({
@@ -28,17 +29,22 @@ export function Iscriviti() {
     setSubmitStatus('idle');
 
     try {
-      // Mock API call - Replace with your FastAPI endpoint
-      const response = await fetch('/api/registrations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      // Map form data to backend format
+      const subscriptionData = {
+        name: `${formData.nome} ${formData.cognome}`.trim(),
+        email: formData.email,
+        phone: formData.telefono,
+        address: `${formData.indirizzo}, ${formData.citta}, ${formData.cap} ${formData.provincia}`.trim(),
+        subscription_year: new Date().getFullYear(),
+        notes: `Data di nascita: ${formData.dataNascita}\n\nMotivazione: ${formData.motivazione}`.trim(),
+      };
 
-      if (response.ok) {
+      // Submit to backend API
+      const response = await submitSubscription(subscriptionData);
+
+      if (response.success) {
         setSubmitStatus('success');
+        // Reset form
         setFormData({
           nome: '',
           cognome: '',
