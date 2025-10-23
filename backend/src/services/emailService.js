@@ -9,12 +9,21 @@ class EmailService {
   async initialize() {
     try {
       console.log('🔧 Initializing email service...');
+
+      // Check if email configuration is present
+      if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+        console.warn('⚠️  Email configuration incomplete - skipping email service initialization');
+        console.log('💡 To enable emails, set EMAIL_HOST, EMAIL_USER, and EMAIL_PASSWORD in .env');
+        return false;
+      }
+
       console.log('📧 Email configuration:', {
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT,
         user: process.env.EMAIL_USER,
         from: process.env.EMAIL_FROM,
-        hasPassword: !!process.env.EMAIL_PASSWORD
+        hasPassword: !!process.env.EMAIL_PASSWORD,
+        passwordLength: process.env.EMAIL_PASSWORD?.length || 0
       });
 
       this.transporter = createTransporter();
@@ -27,9 +36,35 @@ class EmailService {
       return true;
     } catch (error) {
       console.error('❌ Email service initialization failed:', error.message);
-      console.error('📋 Full error:', error);
+      console.error('📋 Error code:', error.code || 'UNKNOWN');
+      console.error('📋 Response code:', error.responseCode || 'N/A');
+      console.error('📋 Response:', error.response || 'N/A');
       console.warn('⚠️  Email functionality will be disabled');
-      console.log('💡 Check your EMAIL_HOST, EMAIL_USER, and EMAIL_PASSWORD in .env');
+      console.log();
+
+      // Provide specific troubleshooting advice
+      if (error.code === 'EAUTH' || error.responseCode === 535) {
+        console.log('🔧 AUTHENTICATION ERROR - Your credentials are incorrect!');
+        console.log('   For Brevo SMTP:');
+        console.log('   1. Go to: https://app.brevo.com/settings/keys/smtp');
+        console.log('   2. Generate a NEW SMTP key');
+        console.log('   3. Update EMAIL_PASSWORD in .env with the new key');
+        console.log('   4. Run: node test-smtp.js (to test independently)');
+        console.log('   5. Restart the server');
+      } else if (error.code === 'ESOCKET' || error.code === 'ECONNECTION') {
+        console.log('🔧 CONNECTION ERROR - Cannot reach SMTP server!');
+        console.log('   Check: EMAIL_HOST and EMAIL_PORT in .env');
+        console.log('   For Brevo: HOST=smtp-relay.brevo.com, PORT=587');
+      } else if (error.code === 'ETIMEDOUT') {
+        console.log('🔧 TIMEOUT ERROR - SMTP server not responding!');
+        console.log('   Check your internet connection and firewall settings');
+      }
+
+      console.log();
+      console.log('💡 The server will continue to run, but emails will not be sent.');
+      console.log('💡 Run "node test-smtp.js" from the backend directory to diagnose issues.');
+      console.log();
+
       return false;
     }
   }
