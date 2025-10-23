@@ -20,6 +20,18 @@ const createTransporter = () => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
     },
+    tls: {
+      // Do not fail on invalid certs - needed for some SMTP providers
+      rejectUnauthorized: false,
+      // Minimum TLS version
+      minVersion: 'TLSv1.2'
+    },
+    // Additional security options
+    requireTLS: true,
+    // Connection timeout
+    connectionTimeout: 10000,
+    // Greeting timeout
+    greetingTimeout: 5000
   });
 };
 
