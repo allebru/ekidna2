@@ -1,23 +1,45 @@
-const { createTransporter, emailTemplates } = require('../config/email');
+const { createTransporter, emailTemplates: smtpEmailTemplates } = require('../config/email');
+const { BrevoEmailClient, emailTemplates } = require('../config/email-api');
 const pool = require('../config/database');
 
 class EmailService {
   constructor() {
     this.transporter = null;
+    this.useHttpApi = false;
+    this.brevoClient = null;
   }
 
   async initialize() {
     try {
       console.log('🔧 Initializing email service...');
 
-      // Check if email configuration is present
+      // Prefer Brevo HTTP API if available (works better in proxy environments)
+      if (process.env.BREVO_API_KEY) {
+        console.log('📧 Found BREVO_API_KEY - using HTTP API');
+        this.brevoClient = new BrevoEmailClient();
+
+        try {
+          await this.brevoClient.verify();
+          this.useHttpApi = true;
+          console.log('✅ Email service initialized successfully (HTTP API)');
+          console.log('📮 Ready to send emails via Brevo HTTP API');
+          return true;
+        } catch (error) {
+          console.error('❌ Brevo HTTP API initialization failed:', error.message);
+          console.log('💡 Falling back to SMTP if available...');
+        }
+      }
+
+      // Fall back to SMTP
       if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
         console.warn('⚠️  Email configuration incomplete - skipping email service initialization');
-        console.log('💡 To enable emails, set EMAIL_HOST, EMAIL_USER, and EMAIL_PASSWORD in .env');
+        console.log('💡 To enable emails, set either:');
+        console.log('   - BREVO_API_KEY (recommended, works in proxy environments)');
+        console.log('   - EMAIL_HOST, EMAIL_USER, and EMAIL_PASSWORD (SMTP)');
         return false;
       }
 
-      console.log('📧 Email configuration:', {
+      console.log('📧 Email configuration (SMTP):', {
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT,
         user: process.env.EMAIL_USER,
@@ -31,7 +53,8 @@ class EmailService {
       // Verify connection
       console.log('🔍 Verifying SMTP connection...');
       await this.transporter.verify();
-      console.log('✅ Email service initialized successfully');
+      this.useHttpApi = false;
+      console.log('✅ Email service initialized successfully (SMTP)');
       console.log('📮 Ready to send emails via:', process.env.EMAIL_HOST);
       return true;
     } catch (error) {
@@ -51,13 +74,21 @@ class EmailService {
         console.log('   3. Update EMAIL_PASSWORD in .env with the new key');
         console.log('   4. Run: node test-smtp.js (to test independently)');
         console.log('   5. Restart the server');
-      } else if (error.code === 'ESOCKET' || error.code === 'ECONNECTION') {
+      } else if (error.code === 'ESOCKET' || error.code === 'ECONNECTION' || error.code === 'EDNS') {
         console.log('🔧 CONNECTION ERROR - Cannot reach SMTP server!');
-        console.log('   Check: EMAIL_HOST and EMAIL_PORT in .env');
-        console.log('   For Brevo: HOST=smtp-relay.brevo.com, PORT=587');
+        console.log('   This often happens when SMTP ports are blocked by firewall/proxy.');
+        console.log('   ');
+        console.log('   RECOMMENDED SOLUTION: Use Brevo HTTP API instead');
+        console.log('   1. Go to: https://app.brevo.com/settings/keys/api');
+        console.log('   2. Create a new API key');
+        console.log('   3. Add to .env: BREVO_API_KEY=your-api-key-here');
+        console.log('   4. Restart the server');
+        console.log('   ');
+        console.log('   HTTP API works through proxies and firewalls!');
       } else if (error.code === 'ETIMEDOUT') {
         console.log('🔧 TIMEOUT ERROR - SMTP server not responding!');
         console.log('   Check your internet connection and firewall settings');
+        console.log('   Or use BREVO_API_KEY for HTTP API instead');
       }
 
       console.log();
@@ -72,8 +103,8 @@ class EmailService {
   async sendSubscriptionConfirmation(subscriber) {
     console.log('📧 Attempting to send confirmation email to:', subscriber.email);
 
-    if (!this.transporter) {
-      console.error('❌ Email transporter not initialized. Skipping email.');
+    if (!this.transporter && !this.brevoClient) {
+      console.error('❌ Email service not initialized. Skipping email.');
       return { success: false, message: 'Email service not configured' };
     }
 
@@ -85,14 +116,27 @@ class EmailService {
     try {
       const template = emailTemplates.subscriptionConfirmation(subscriber);
 
-      console.log('📤 Sending email via SMTP...');
-      const info = await this.transporter.sendMail({
-        from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
-        to: subscriber.email,
-        subject: template.subject,
-        text: template.text,
-        html: template.html
-      });
+      let info;
+      if (this.useHttpApi && this.brevoClient) {
+        console.log('📤 Sending email via Brevo HTTP API...');
+        info = await this.brevoClient.sendMail({
+          to: subscriber.email,
+          subject: template.subject,
+          text: template.text,
+          html: template.html
+        });
+      } else if (this.transporter) {
+        console.log('📤 Sending email via SMTP...');
+        info = await this.transporter.sendMail({
+          from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
+          to: subscriber.email,
+          subject: template.subject,
+          text: template.text,
+          html: template.html
+        });
+      } else {
+        throw new Error('No email transport available');
+      }
 
       console.log('✅ Confirmation email sent successfully!');
       console.log('📬 Message ID:', info.messageId);
@@ -126,8 +170,8 @@ class EmailService {
   }
 
   async sendStaffNotification(subscriber) {
-    if (!this.transporter) {
-      console.warn('Email transporter not initialized. Skipping staff notification.');
+    if (!this.transporter && !this.brevoClient) {
+      console.warn('Email service not initialized. Skipping staff notification.');
       return { success: false, message: 'Email service not configured' };
     }
 
@@ -146,13 +190,25 @@ class EmailService {
       const staffEmails = result.rows.map(row => row.email);
       const template = emailTemplates.staffNotification(subscriber);
 
-      const info = await this.transporter.sendMail({
-        from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
-        to: staffEmails.join(','),
-        subject: template.subject,
-        text: template.text,
-        html: template.html
-      });
+      let info;
+      if (this.useHttpApi && this.brevoClient) {
+        info = await this.brevoClient.sendMail({
+          to: staffEmails.join(','),
+          subject: template.subject,
+          text: template.text,
+          html: template.html
+        });
+      } else if (this.transporter) {
+        info = await this.transporter.sendMail({
+          from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
+          to: staffEmails.join(','),
+          subject: template.subject,
+          text: template.text,
+          html: template.html
+        });
+      } else {
+        throw new Error('No email transport available');
+      }
 
       console.log('Staff notification email sent:', info.messageId);
 
