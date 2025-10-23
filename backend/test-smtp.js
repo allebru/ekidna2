@@ -7,7 +7,11 @@
  * Usage: node test-smtp.js
  */
 
-require('dotenv').config();
+const path = require('path');
+
+// Load .env from parent directory (project root)
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+
 const nodemailer = require('nodemailer');
 
 console.log('='.repeat(60));
