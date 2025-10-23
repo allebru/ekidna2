@@ -1,18 +1,18 @@
 const nodemailer = require('nodemailer');
 
 // Verify nodemailer is loaded correctly
-if (!nodemailer || typeof nodemailer.createTransporter !== 'function') {
+if (!nodemailer || typeof nodemailer.createTransport !== 'function') {
   console.error('❌ CRITICAL: nodemailer module not loaded correctly!');
   console.error('nodemailer type:', typeof nodemailer);
   console.error('nodemailer object:', nodemailer);
-  throw new Error('nodemailer.createTransporter is not available. Run: npm install nodemailer');
+  throw new Error('nodemailer.createTransport is not available. Run: npm install nodemailer');
 }
 
 console.log('✅ nodemailer module loaded successfully');
 
 // Create transporter for sending emails
 const createTransporter = () => {
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.EMAIL_PORT) || 587,
     secure: false, // true for 465, false for other ports
