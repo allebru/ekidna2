@@ -8,9 +8,44 @@
  */
 
 const path = require('path');
+const fs = require('fs');
+
+// Determine .env file location
+const envPath = path.join(__dirname, '..', '.env');
+
+console.log('='.repeat(60));
+console.log('SMTP CONNECTION TEST - DEBUG MODE');
+console.log('='.repeat(60));
+console.log();
+console.log('🔍 Debug Information:');
+console.log('  Current directory (__dirname):', __dirname);
+console.log('  Looking for .env at:', envPath);
+console.log('  .env file exists:', fs.existsSync(envPath));
+console.log();
 
 // Load .env from parent directory (project root)
-require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+const result = require('dotenv').config({ path: envPath });
+
+if (result.error) {
+  console.error('❌ Error loading .env file:', result.error.message);
+  console.log();
+  console.log('💡 Troubleshooting:');
+  console.log('  1. Make sure you have a .env file in the project root');
+  console.log('  2. The .env file should be at:', envPath);
+  console.log('  3. Try creating it by copying .env.example:');
+  console.log('     cp .env.example .env');
+  console.log();
+  process.exit(1);
+} else {
+  console.log('✅ .env file loaded successfully');
+  console.log('  Variables loaded:', Object.keys(result.parsed || {}).length);
+  console.log('  Email vars found:', {
+    EMAIL_HOST: !!result.parsed?.EMAIL_HOST,
+    EMAIL_USER: !!result.parsed?.EMAIL_USER,
+    EMAIL_PASSWORD: !!result.parsed?.EMAIL_PASSWORD
+  });
+  console.log();
+}
 
 const nodemailer = require('nodemailer');
 
