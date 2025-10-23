@@ -8,32 +8,49 @@ class EmailService {
 
   async initialize() {
     try {
+      console.log('🔧 Initializing email service...');
+      console.log('📧 Email configuration:', {
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        user: process.env.EMAIL_USER,
+        from: process.env.EMAIL_FROM,
+        hasPassword: !!process.env.EMAIL_PASSWORD
+      });
+
       this.transporter = createTransporter();
+
       // Verify connection
+      console.log('🔍 Verifying SMTP connection...');
       await this.transporter.verify();
-      console.log('Email service initialized successfully');
+      console.log('✅ Email service initialized successfully');
+      console.log('📮 Ready to send emails via:', process.env.EMAIL_HOST);
       return true;
     } catch (error) {
-      console.error('Email service initialization failed:', error.message);
-      console.warn('Email functionality will be disabled');
+      console.error('❌ Email service initialization failed:', error.message);
+      console.error('📋 Full error:', error);
+      console.warn('⚠️  Email functionality will be disabled');
+      console.log('💡 Check your EMAIL_HOST, EMAIL_USER, and EMAIL_PASSWORD in .env');
       return false;
     }
   }
 
   async sendSubscriptionConfirmation(subscriber) {
+    console.log('📧 Attempting to send confirmation email to:', subscriber.email);
+
     if (!this.transporter) {
-      console.warn('Email transporter not initialized. Skipping email.');
+      console.error('❌ Email transporter not initialized. Skipping email.');
       return { success: false, message: 'Email service not configured' };
     }
 
     if (!subscriber.email) {
-      console.warn('Subscriber has no email address. Skipping email.');
+      console.warn('⚠️  Subscriber has no email address. Skipping email.');
       return { success: false, message: 'No email address provided' };
     }
 
     try {
       const template = emailTemplates.subscriptionConfirmation(subscriber);
 
+      console.log('📤 Sending email via SMTP...');
       const info = await this.transporter.sendMail({
         from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
         to: subscriber.email,
@@ -42,7 +59,9 @@ class EmailService {
         html: template.html
       });
 
-      console.log('Confirmation email sent:', info.messageId);
+      console.log('✅ Confirmation email sent successfully!');
+      console.log('📬 Message ID:', info.messageId);
+      console.log('👤 Sent to:', subscriber.email);
 
       // Update database to mark email as sent
       await pool.query(
@@ -53,13 +72,16 @@ class EmailService {
         [subscriber.id]
       );
 
+      console.log('✅ Database updated - email confirmed');
+
       return {
         success: true,
         messageId: info.messageId,
         message: 'Confirmation email sent successfully'
       };
     } catch (error) {
-      console.error('Failed to send confirmation email:', error);
+      console.error('❌ Failed to send confirmation email:', error.message);
+      console.error('📋 Full error:', error);
       return {
         success: false,
         error: error.message,
