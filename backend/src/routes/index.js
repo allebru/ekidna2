@@ -3,10 +3,12 @@ const router = express.Router();
 
 const authRoutes = require('./auth');
 const subscriberRoutes = require('./subscribers');
+const testRoutes = require('./test');
 
 // API Routes
 router.use('/auth', authRoutes);
 router.use('/subscribers', subscriberRoutes);
+router.use('/test', testRoutes);
 
 // Health check
 router.get('/health', (req, res) => {
@@ -40,6 +42,10 @@ router.get('/', (req, res) => {
         restore: 'POST /api/subscribers/:id/restore',
         stats: 'GET /api/subscribers/stats',
         byYear: 'GET /api/subscribers/year/:year'
+      },
+      test: {
+        emailStatus: 'GET /api/test/email-status',
+        sendTestEmail: 'POST /api/test/send-email'
       }
     }
   });
