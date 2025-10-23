@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: ekidna_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-ekidna_db}
+      POSTGRES_USER: ${DB_USER:-ekidna_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - ekidna_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ekidna_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ekidna_backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-3001}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-ekidna_db}
+      DB_USER: ${DB_USER:-ekidna_user}
+      DB_PASSWORD: ${DB_PASSWORD:-changeme123}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      EMAIL_HOST: ${EMAIL_HOST:-smtp.gmail.com}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_FROM: ${EMAIL_FROM:-noreply@ekidna.org}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+    ports:
+      - "3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ekidna_network
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/logs:/app/logs
+
+  # Adminer - Database Management UI (optional, for development)
+  adminer:
+    image: adminer:latest
+    container_name: ekidna_adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - ekidna_network
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  ekidna_network:
+    driver: bridge
