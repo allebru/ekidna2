@@ -27,6 +27,22 @@ check_docker() {
     echo -e "${GREEN}✓ Docker is installed${NC}"
 }
 
+# Check if Docker daemon is running
+check_docker_running() {
+    if ! docker info &> /dev/null; then
+        echo -e "${RED}❌ Docker daemon is not running${NC}"
+        echo ""
+        echo "Please start Docker Desktop and try again."
+        echo ""
+        echo "Windows: Start Docker Desktop from the Start menu"
+        echo "Mac: Start Docker Desktop from Applications"
+        echo "Linux: Run 'sudo systemctl start docker'"
+        echo ""
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Docker daemon is running${NC}"
+}
+
 # Check if Docker Compose is installed
 check_docker_compose() {
     if ! command -v docker-compose &> /dev/null; then
@@ -196,6 +212,7 @@ show_next_steps() {
 main() {
     echo "Checking prerequisites..."
     check_docker
+    check_docker_running
     check_docker_compose
     check_node
 
