@@ -1,5 +1,15 @@
 const nodemailer = require('nodemailer');
 
+// Verify nodemailer is loaded correctly
+if (!nodemailer || typeof nodemailer.createTransporter !== 'function') {
+  console.error('❌ CRITICAL: nodemailer module not loaded correctly!');
+  console.error('nodemailer type:', typeof nodemailer);
+  console.error('nodemailer object:', nodemailer);
+  throw new Error('nodemailer.createTransporter is not available. Run: npm install nodemailer');
+}
+
+console.log('✅ nodemailer module loaded successfully');
+
 // Create transporter for sending emails
 const createTransporter = () => {
   return nodemailer.createTransporter({
