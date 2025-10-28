@@ -101,7 +101,31 @@ class EmailService {
   }
 
   async sendSubscriptionConfirmation(subscriber, attachments = []) {
-    console.log('📧 Attempting to send confirmation email to:', subscriber.email);
+    console.log('');
+    console.log('='.repeat(70));
+    console.log('📧 SENDSUBSCRIPTIONCONFIRMATION CALLED');
+    console.log('='.repeat(70));
+    console.log('📧 To:', subscriber.email);
+    console.log('📧 Subscriber name:', subscriber.name);
+    console.log('📧 Attachments parameter received:');
+    console.log('   - Is defined:', attachments !== undefined);
+    console.log('   - Is array:', Array.isArray(attachments));
+    console.log('   - Length:', attachments ? attachments.length : 'N/A');
+    if (attachments && attachments.length > 0) {
+      attachments.forEach((att, idx) => {
+        console.log(`   - Attachment[${idx}]:`, {
+          filename: att.filename,
+          hasContent: !!att.content,
+          contentIsBuffer: Buffer.isBuffer(att.content),
+          contentLength: att.content?.length || 0,
+          contentType: att.contentType
+        });
+      });
+    } else {
+      console.log('   - ⚠️  WARNING: No attachments in array!');
+    }
+    console.log('='.repeat(70));
+    console.log('');
 
     if (!this.transporter && !this.brevoClient) {
       console.error('❌ Email service not initialized. Skipping email.');
@@ -131,14 +155,22 @@ class EmailService {
         }
 
         // Format attachments for Brevo HTTP API
-        const brevoAttachments = attachments.map(att => {
+        console.log('🔄 Converting attachments for Brevo HTTP API format...');
+        const brevoAttachments = attachments.map((att, idx) => {
+          console.log(`📎 Processing attachment ${idx + 1}/${attachments.length}: ${att.filename}`);
+
+          if (!att.content || !Buffer.isBuffer(att.content)) {
+            console.error(`❌ ERROR: Attachment ${idx} has invalid content!`);
+            throw new Error(`Attachment ${att.filename} has invalid content (not a Buffer)`);
+          }
+
           const base64Content = att.content.toString('base64');
           const sizeInBytes = att.content.length;
           const sizeInMB = (sizeInBytes / 1024 / 1024).toFixed(2);
 
-          console.log(`📎 Processing attachment: ${att.filename}`);
           console.log(`   - Original size: ${sizeInBytes} bytes (${sizeInMB} MB)`);
           console.log(`   - Base64 size: ${base64Content.length} chars`);
+          console.log(`   - Content type: ${att.contentType || 'not specified'}`);
 
           // Warn if attachment is close to Brevo's 2MB limit
           if (sizeInBytes > 1.5 * 1024 * 1024) {
