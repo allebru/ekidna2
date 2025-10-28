@@ -36,6 +36,8 @@ class SubscriberController {
         (async () => {
           try {
             console.log('🎫 Generating membership card for:', subscriber.name);
+            console.log('   - Serial Number:', subscriber.serial_number);
+            console.log('   - Year:', subscriber.subscription_year);
 
             // Generate the membership card PDF
             const membershipCardPdf = await pdfService.generateMembershipCard({
@@ -45,19 +47,35 @@ class SubscriberController {
             });
 
             console.log('✅ Membership card generated successfully');
+            console.log('   - PDF size:', membershipCardPdf.length, 'bytes');
+            console.log('   - Is Buffer:', Buffer.isBuffer(membershipCardPdf));
 
             // Prepare attachment for email
+            const filename = `Tessera_Ekidna_${subscriber.subscription_year}_${String(subscriber.serial_number).padStart(5, '0')}.pdf`;
             const attachments = [{
-              filename: `Tessera_Ekidna_${subscriber.subscription_year}_${String(subscriber.serial_number).padStart(5, '0')}.pdf`,
+              filename: filename,
               content: membershipCardPdf,
               contentType: 'application/pdf'
             }];
 
+            console.log('📎 Prepared attachment:', filename);
+            console.log('   - Content size:', membershipCardPdf.length, 'bytes');
+            console.log('   - Content type:', 'application/pdf');
+
             // Send confirmation email with attachment
-            await emailService.sendSubscriptionConfirmation(subscriber, attachments);
-            console.log('✅ Confirmation email sent with membership card');
+            console.log('📧 Sending confirmation email to:', subscriber.email);
+            const result = await emailService.sendSubscriptionConfirmation(subscriber, attachments);
+
+            if (result.success) {
+              console.log('✅ Confirmation email sent with membership card');
+              console.log('   - Message ID:', result.messageId);
+            } else {
+              console.error('❌ Failed to send confirmation email:', result.message);
+            }
           } catch (err) {
             console.error('❌ Failed to generate/send membership card:', err);
+            console.error('   - Error message:', err.message);
+            console.error('   - Error stack:', err.stack);
           }
         })();
 

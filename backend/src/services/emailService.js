@@ -119,12 +119,45 @@ class EmailService {
       let info;
       if (this.useHttpApi && this.brevoClient) {
         console.log('📤 Sending email via Brevo HTTP API...');
+        console.log('📎 Raw attachments received:', attachments.length, 'files');
+
+        if (attachments.length > 0) {
+          console.log('📎 Attachment details:', attachments.map(a => ({
+            filename: a.filename,
+            contentType: a.contentType,
+            contentLength: a.content?.length || 0,
+            isBuffer: Buffer.isBuffer(a.content)
+          })));
+        }
 
         // Format attachments for Brevo HTTP API
-        const brevoAttachments = attachments.map(att => ({
-          name: att.filename,
-          content: att.content.toString('base64')
-        }));
+        const brevoAttachments = attachments.map(att => {
+          const base64Content = att.content.toString('base64');
+          const sizeInBytes = att.content.length;
+          const sizeInMB = (sizeInBytes / 1024 / 1024).toFixed(2);
+
+          console.log(`📎 Processing attachment: ${att.filename}`);
+          console.log(`   - Original size: ${sizeInBytes} bytes (${sizeInMB} MB)`);
+          console.log(`   - Base64 size: ${base64Content.length} chars`);
+
+          // Warn if attachment is close to Brevo's 2MB limit
+          if (sizeInBytes > 1.5 * 1024 * 1024) {
+            console.warn(`⚠️  WARNING: Attachment is large (${sizeInMB} MB). Brevo has a 2MB limit per attachment.`);
+          }
+
+          return {
+            name: att.filename,
+            content: base64Content
+          };
+        });
+
+        console.log('📎 Formatted Brevo attachments:', brevoAttachments.length);
+        if (brevoAttachments.length > 0) {
+          console.log('📎 Total attachments ready to send:', brevoAttachments.length);
+          brevoAttachments.forEach((att, index) => {
+            console.log(`   ${index + 1}. ${att.name} (base64: ${att.content.length} chars)`);
+          });
+        }
 
         info = await this.brevoClient.sendMail({
           to: subscriber.email,
@@ -135,6 +168,16 @@ class EmailService {
         });
       } else if (this.transporter) {
         console.log('📤 Sending email via SMTP...');
+        console.log('📎 Raw attachments received:', attachments.length, 'files');
+
+        if (attachments.length > 0) {
+          console.log('📎 Attachment details:', attachments.map(a => ({
+            filename: a.filename,
+            contentType: a.contentType,
+            contentLength: a.content?.length || 0,
+            isBuffer: Buffer.isBuffer(a.content)
+          })));
+        }
 
         // Format attachments for Nodemailer SMTP
         const smtpAttachments = attachments.map(att => ({
@@ -142,6 +185,13 @@ class EmailService {
           content: att.content,
           contentType: att.contentType || 'application/pdf'
         }));
+
+        console.log('📎 Formatted SMTP attachments:', smtpAttachments.length);
+        if (smtpAttachments.length > 0) {
+          smtpAttachments.forEach((att, index) => {
+            console.log(`   ${index + 1}. ${att.filename} (${att.content.length} bytes, ${att.contentType})`);
+          });
+        }
 
         info = await this.transporter.sendMail({
           from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
