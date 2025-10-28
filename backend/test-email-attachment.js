@@ -51,7 +51,7 @@ async function testEmailWithAttachment() {
     // Generate test PDF
     console.log('Step 2: Generating test membership card PDF...');
     const testSubscriber = {
-      name: 'Test User',
+      name: 'Pierugoberto Tschurtschenthaler',
       serialNumber: 99999,
       year: new Date().getFullYear()
     };
