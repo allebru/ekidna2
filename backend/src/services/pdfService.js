@@ -4,7 +4,10 @@ const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
 
 class PDFService {
   constructor() {
-    this.templatePath = path.join(__dirname, '../../..', 'pdf', 'tessera_ekidna.pdf');
+    // In Docker: __dirname = /app/src/services, so ../.. = /app
+    // In local dev: __dirname = /path/to/backend/src/services, so ../.. = /path/to/backend
+    // Then we add /pdf/tessera_ekidna.pdf to get to the template
+    this.templatePath = path.join(__dirname, '../..', 'pdf', 'tessera_ekidna.pdf');
   }
 
   async generateMembershipCard(subscriberData) {

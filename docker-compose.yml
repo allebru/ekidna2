@@ -49,6 +49,7 @@ services:
     volumes:
       - ./backend/src:/app/src
       - ./backend/logs:/app/logs
+      - ./pdf:/app/pdf
 
   # Adminer - Database Management UI (optional, for development)
   adminer:
