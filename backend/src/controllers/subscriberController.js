@@ -38,6 +38,7 @@ class SubscriberController {
             console.log('🎫 Generating membership card for:', subscriber.name);
             console.log('   - Serial Number:', subscriber.serial_number);
             console.log('   - Year:', subscriber.subscription_year);
+            console.log('   - Email:', subscriber.email);
 
             // Generate the membership card PDF
             const membershipCardPdf = await pdfService.generateMembershipCard({
@@ -46,8 +47,20 @@ class SubscriberController {
               year: subscriber.subscription_year
             });
 
+            // Validate PDF generation
+            if (!membershipCardPdf) {
+              throw new Error('PDF generation returned null/undefined');
+            }
+            if (!Buffer.isBuffer(membershipCardPdf)) {
+              throw new Error(`PDF generation returned invalid type: ${typeof membershipCardPdf}`);
+            }
+            if (membershipCardPdf.length === 0) {
+              throw new Error('PDF generation returned empty buffer');
+            }
+
             console.log('✅ Membership card generated successfully');
             console.log('   - PDF size:', membershipCardPdf.length, 'bytes');
+            console.log('   - PDF size (KB):', (membershipCardPdf.length / 1024).toFixed(2), 'KB');
             console.log('   - Is Buffer:', Buffer.isBuffer(membershipCardPdf));
 
             // Prepare attachment for email
@@ -58,12 +71,27 @@ class SubscriberController {
               contentType: 'application/pdf'
             }];
 
-            console.log('📎 Prepared attachment:', filename);
-            console.log('   - Content size:', membershipCardPdf.length, 'bytes');
-            console.log('   - Content type:', 'application/pdf');
+            console.log('📎 Prepared attachment object:', filename);
+            console.log('   - Attachments array length:', attachments.length);
+            console.log('   - Attachment[0].filename:', attachments[0].filename);
+            console.log('   - Attachment[0].content is Buffer:', Buffer.isBuffer(attachments[0].content));
+            console.log('   - Attachment[0].content.length:', attachments[0].content.length);
+            console.log('   - Attachment[0].contentType:', attachments[0].contentType);
+
+            // Validate attachments before sending
+            if (!attachments || attachments.length === 0) {
+              throw new Error('Attachments array is empty');
+            }
+            if (!attachments[0].content || !Buffer.isBuffer(attachments[0].content)) {
+              throw new Error('Attachment content is invalid');
+            }
 
             // Send confirmation email with attachment
-            console.log('📧 Sending confirmation email to:', subscriber.email);
+            console.log('📧 About to send confirmation email...');
+            console.log('   - To:', subscriber.email);
+            console.log('   - With attachments:', attachments.length, 'file(s)');
+            console.log('   - Calling: emailService.sendSubscriptionConfirmation()');
+
             const result = await emailService.sendSubscriptionConfirmation(subscriber, attachments);
 
             if (result.success) {
