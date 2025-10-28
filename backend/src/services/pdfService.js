@@ -38,49 +38,70 @@ class PDFService {
       const firstPage = pages[0];
       const { width, height } = firstPage.getSize();
 
-      // Embed font - using Helvetica Oblique (italic) as cursive alternative
-      // Note: pdf-lib standard fonts don't include true cursive fonts
-      // For actual cursive fonts, you would need to embed a custom TTF font
-      const font = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+      // Embed fonts
+      const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      // Using TimesRomanItalic for a more elegant/cursive look for names
+      const cursiveFont = await pdfDoc.embedFont(StandardFonts.TimesRomanItalic);
 
       // Text color: black
       const textColor = rgb(0, 0, 0);
 
-      // TOP ZONE: Year and Serial Number
-      // Format: "2025 - N. 00123"
-      const topText = `${year} - N. ${String(serialNumber).padStart(5, '0')}`;
-      const topFontSize = 16;
-      const topTextWidth = font.widthOfTextAtSize(topText, topFontSize);
+      // PDF positioning coordinates (from bottom-left origin)
+      // Coordinates extracted from tessera_compilata.pdf
+      const POSITIONS = {
+        year: { x: 25.0, y: 24.776, fontSize: 7.4 },
+        number: { x: 75.0, y: 24.776, fontSize: 7.4 },
+        firstName: { x: 35.0, y: 97.020, fontSize: 26.64 },
+        lastName: { x: 96.218, y: 97.020, fontSize: 26.64 }
+      };
 
-      // Position for top zone (centered in the smaller blank area at top)
-      const topX = (width - topTextWidth) / 2;
-      const topY = height - 145; // Adjusted based on template layout
-
-      firstPage.drawText(topText, {
-        x: topX,
-        y: topY,
-        size: topFontSize,
-        font: font,
+      // BOTTOM ZONE: Year and Membership Number
+      // Year text (e.g., "2025")
+      firstPage.drawText(String(year), {
+        x: POSITIONS.year.x,
+        y: POSITIONS.year.y,
+        size: POSITIONS.year.fontSize,
+        font: regularFont,
         color: textColor,
       });
 
-      // BOTTOM ZONE: Name and Surname
-      // Format: "NOME COGNOME"
-      const bottomText = name.toUpperCase();
-      const bottomFontSize = 22;
-      const bottomTextWidth = font.widthOfTextAtSize(bottomText, bottomFontSize);
-
-      // Position for bottom zone (centered in the larger blank area at bottom)
-      const bottomX = (width - bottomTextWidth) / 2;
-      const bottomY = height - 600; // Adjusted based on template layout
-
-      firstPage.drawText(bottomText, {
-        x: bottomX,
-        y: bottomY,
-        size: bottomFontSize,
-        font: font,
+      // Membership number (e.g., "N. 00123")
+      const numberText = `N. ${String(serialNumber).padStart(5, '0')}`;
+      firstPage.drawText(numberText, {
+        x: POSITIONS.number.x,
+        y: POSITIONS.number.y,
+        size: POSITIONS.number.fontSize,
+        font: regularFont,
         color: textColor,
       });
+
+      // MIDDLE ZONE: Name and Surname (in cursive style)
+      // Split the full name into first and last name
+      const nameParts = name.trim().split(/\s+/);
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      // First name
+      if (firstName) {
+        firstPage.drawText(firstName, {
+          x: POSITIONS.firstName.x,
+          y: POSITIONS.firstName.y,
+          size: POSITIONS.firstName.fontSize,
+          font: cursiveFont,
+          color: textColor,
+        });
+      }
+
+      // Last name
+      if (lastName) {
+        firstPage.drawText(lastName, {
+          x: POSITIONS.lastName.x,
+          y: POSITIONS.lastName.y,
+          size: POSITIONS.lastName.fontSize,
+          font: cursiveFont,
+          color: textColor,
+        });
+      }
 
       // Save the modified PDF
       const pdfBytes = await pdfDoc.save();
