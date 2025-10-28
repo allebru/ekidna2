@@ -18,8 +18,12 @@ WHERE serial_number IS NULL;
 ALTER TABLE subscribers
 ALTER COLUMN serial_number SET NOT NULL;
 
+-- Set DEFAULT value for future inserts
+ALTER TABLE subscribers
+ALTER COLUMN serial_number SET DEFAULT nextval('subscribers_serial_seq');
+
 -- Create index for faster lookups
-CREATE INDEX idx_subscribers_serial_number ON subscribers(serial_number);
+CREATE INDEX IF NOT EXISTS idx_subscribers_serial_number ON subscribers(serial_number);
 
 -- Add comment for documentation
 COMMENT ON COLUMN subscribers.serial_number IS 'Progressive subscription number used for membership card identification';
