@@ -16,6 +16,9 @@ CREATE TABLE IF NOT EXISTS staff_users (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create sequence for membership card serial numbers
+CREATE SEQUENCE IF NOT EXISTS subscribers_serial_seq START 1;
+
 -- Subscribers table (main data from website subscription form)
 CREATE TABLE IF NOT EXISTS subscribers (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -24,6 +27,7 @@ CREATE TABLE IF NOT EXISTS subscribers (
     phone VARCHAR(50),
     address TEXT,
     subscription_year INTEGER NOT NULL,
+    serial_number INTEGER UNIQUE NOT NULL DEFAULT nextval('subscribers_serial_seq'),
     status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'deleted', 'pending')),
     email_confirmed BOOLEAN DEFAULT false,
     email_confirmation_token VARCHAR(255),
@@ -50,6 +54,7 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 CREATE INDEX IF NOT EXISTS idx_subscribers_email ON subscribers(email);
 CREATE INDEX IF NOT EXISTS idx_subscribers_status ON subscribers(status);
 CREATE INDEX IF NOT EXISTS idx_subscribers_subscription_year ON subscribers(subscription_year);
+CREATE INDEX IF NOT EXISTS idx_subscribers_serial_number ON subscribers(serial_number);
 CREATE INDEX IF NOT EXISTS idx_subscribers_created_at ON subscribers(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_staff_users_email ON staff_users(email);
 CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at ON activity_logs(created_at DESC);

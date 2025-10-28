@@ -67,6 +67,7 @@ class BrevoEmailClient {
    * @param {string} options.html - HTML content
    * @param {string} options.text - Plain text content
    * @param {string} options.from - Sender email (optional, uses default)
+   * @param {Array} options.attachments - Array of attachments {name, content} (optional)
    * @returns {Promise<Object>} - Result with messageId
    */
   async sendMail(options) {
@@ -100,6 +101,11 @@ class BrevoEmailClient {
       htmlContent: options.html,
       textContent: options.text
     };
+
+    // Add attachments if provided (already base64 encoded)
+    if (options.attachments && options.attachments.length > 0) {
+      payload.attachment = options.attachments;
+    }
 
     try {
       console.log('📤 Sending email via Brevo API...');
@@ -181,7 +187,9 @@ const emailTemplates = {
               ${subscriber.phone ? `<li><strong>Telefono:</strong> ${subscriber.phone}</li>` : ''}
               ${subscriber.address ? `<li><strong>Indirizzo:</strong> ${subscriber.address}</li>` : ''}
               <li><strong>Anno di iscrizione:</strong> ${subscriber.subscription_year}</li>
+              ${subscriber.serial_number ? `<li><strong>Numero tessera:</strong> ${String(subscriber.serial_number).padStart(5, '0')}</li>` : ''}
             </ul>
+            <p><strong>📎 In allegato trovi la tua tessera associativa personalizzata!</strong></p>
             <p>La tua iscrizione è ora attiva. Riceverai presto ulteriori informazioni sulle nostre attività ed eventi.</p>
             <p>Se hai domande o necessiti di assistenza, non esitare a contattarci.</p>
             <p>Grazie per il tuo supporto!</p>
@@ -208,6 +216,9 @@ const emailTemplates = {
       ${subscriber.phone ? `- Telefono: ${subscriber.phone}` : ''}
       ${subscriber.address ? `- Indirizzo: ${subscriber.address}` : ''}
       - Anno di iscrizione: ${subscriber.subscription_year}
+      ${subscriber.serial_number ? `- Numero tessera: ${String(subscriber.serial_number).padStart(5, '0')}` : ''}
+
+      In allegato trovi la tua tessera associativa personalizzata!
 
       La tua iscrizione è ora attiva. Riceverai presto ulteriori informazioni sulle nostre attività ed eventi.
 

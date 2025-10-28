@@ -1,6 +1,7 @@
 const Subscriber = require('../models/Subscriber');
 const ActivityLog = require('../models/ActivityLog');
 const emailService = require('../services/emailService');
+const pdfService = require('../services/pdfService');
 
 class SubscriberController {
   // Create new subscriber (from website form)
@@ -29,11 +30,36 @@ class SubscriberController {
         notes
       });
 
-      // Send confirmation email (async, don't wait)
+      // Send confirmation email with membership card (async, don't wait)
       if (email) {
-        emailService.sendSubscriptionConfirmation(subscriber).catch(err => {
-          console.error('Failed to send confirmation email:', err);
-        });
+        // Generate membership card PDF and send with email
+        (async () => {
+          try {
+            console.log('🎫 Generating membership card for:', subscriber.name);
+
+            // Generate the membership card PDF
+            const membershipCardPdf = await pdfService.generateMembershipCard({
+              name: subscriber.name,
+              serialNumber: subscriber.serial_number,
+              year: subscriber.subscription_year
+            });
+
+            console.log('✅ Membership card generated successfully');
+
+            // Prepare attachment for email
+            const attachments = [{
+              filename: `Tessera_Ekidna_${subscriber.subscription_year}_${String(subscriber.serial_number).padStart(5, '0')}.pdf`,
+              content: membershipCardPdf,
+              contentType: 'application/pdf'
+            }];
+
+            // Send confirmation email with attachment
+            await emailService.sendSubscriptionConfirmation(subscriber, attachments);
+            console.log('✅ Confirmation email sent with membership card');
+          } catch (err) {
+            console.error('❌ Failed to generate/send membership card:', err);
+          }
+        })();
 
         // Send notification to staff (async)
         emailService.sendStaffNotification(subscriber).catch(err => {
@@ -48,7 +74,8 @@ class SubscriberController {
           id: subscriber.id,
           name: subscriber.name,
           email: subscriber.email,
-          subscription_year: subscriber.subscription_year
+          subscription_year: subscriber.subscription_year,
+          serial_number: subscriber.serial_number
         }
       });
     } catch (error) {

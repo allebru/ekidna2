@@ -100,7 +100,7 @@ class EmailService {
     }
   }
 
-  async sendSubscriptionConfirmation(subscriber) {
+  async sendSubscriptionConfirmation(subscriber, attachments = []) {
     console.log('📧 Attempting to send confirmation email to:', subscriber.email);
 
     if (!this.transporter && !this.brevoClient) {
@@ -119,20 +119,37 @@ class EmailService {
       let info;
       if (this.useHttpApi && this.brevoClient) {
         console.log('📤 Sending email via Brevo HTTP API...');
+
+        // Format attachments for Brevo HTTP API
+        const brevoAttachments = attachments.map(att => ({
+          name: att.filename,
+          content: att.content.toString('base64')
+        }));
+
         info = await this.brevoClient.sendMail({
           to: subscriber.email,
           subject: template.subject,
           text: template.text,
-          html: template.html
+          html: template.html,
+          attachments: brevoAttachments.length > 0 ? brevoAttachments : undefined
         });
       } else if (this.transporter) {
         console.log('📤 Sending email via SMTP...');
+
+        // Format attachments for Nodemailer SMTP
+        const smtpAttachments = attachments.map(att => ({
+          filename: att.filename,
+          content: att.content,
+          contentType: att.contentType || 'application/pdf'
+        }));
+
         info = await this.transporter.sendMail({
           from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
           to: subscriber.email,
           subject: template.subject,
           text: template.text,
-          html: template.html
+          html: template.html,
+          attachments: smtpAttachments.length > 0 ? smtpAttachments : undefined
         });
       } else {
         throw new Error('No email transport available');
@@ -141,6 +158,9 @@ class EmailService {
       console.log('✅ Confirmation email sent successfully!');
       console.log('📬 Message ID:', info.messageId);
       console.log('👤 Sent to:', subscriber.email);
+      if (attachments.length > 0) {
+        console.log('📎 Attachments:', attachments.map(a => a.filename).join(', '));
+      }
 
       // Update database to mark email as sent
       await pool.query(
