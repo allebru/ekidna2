@@ -105,12 +105,36 @@ class BrevoEmailClient {
     // Add attachments if provided (already base64 encoded)
     if (options.attachments && options.attachments.length > 0) {
       payload.attachment = options.attachments;
+      console.log('📎 Adding', options.attachments.length, 'attachment(s) to payload');
+      console.log('📎 Attachment names:', options.attachments.map(a => a.name).join(', '));
+
+      // Verify attachment structure
+      options.attachments.forEach((att, index) => {
+        console.log(`   Attachment ${index + 1}:`, {
+          name: att.name,
+          hasContent: !!att.content,
+          contentLength: att.content?.length || 0
+        });
+      });
+    } else {
+      console.log('📎 No attachments to add');
     }
 
     try {
       console.log('📤 Sending email via Brevo API...');
       console.log('  To:', toEmail);
       console.log('  Subject:', options.subject);
+      console.log('  Has attachments in payload:', !!payload.attachment);
+      console.log('📋 Final payload structure:', JSON.stringify({
+        sender: payload.sender,
+        to: payload.to,
+        subject: payload.subject,
+        hasHtmlContent: !!payload.htmlContent,
+        hasTextContent: !!payload.textContent,
+        hasAttachment: !!payload.attachment,
+        attachmentCount: payload.attachment?.length || 0,
+        attachmentNames: payload.attachment?.map(a => a.name) || []
+      }, null, 2));
 
       const response = await axios.post(`${this.baseURL}/smtp/email`, payload, {
         headers: {
@@ -121,6 +145,8 @@ class BrevoEmailClient {
 
       console.log('✅ Email sent successfully via Brevo API');
       console.log('📬 Message ID:', response.data.messageId);
+      console.log('📋 Response status:', response.status);
+      console.log('📋 Response data:', JSON.stringify(response.data, null, 2));
 
       return {
         messageId: response.data.messageId,
