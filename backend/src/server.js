@@ -18,9 +18,15 @@ const PORT = process.env.PORT || 3001;
 // Security middleware
 app.use(helmet());
 
-// CORS configuration
+// CORS configuration — allow all localhost ports in dev, restrict to FRONTEND_URL in prod
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // same-origin / curl
+    const isLocalhost = /^https?:\/\/localhost(:\d+)?$/.test(origin);
+    const frontendUrl = process.env.FRONTEND_URL;
+    if (isLocalhost || origin === frontendUrl) return callback(null, true);
+    callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
   credentials: true
 }));
 

@@ -1,4 +1,5 @@
-# Environment variables
+# Environment variables (never commit real secrets)
+.env
 .env.local
 .env.*.local
 
@@ -15,6 +16,13 @@ Thumbs.db
 
 # Docker volumes
 postgres_data/
+
+# Build output
+MVP/build/
+website/build/
+
+# Lock files (generated)
+package-lock.json
 
 # IDE
 .vscode/

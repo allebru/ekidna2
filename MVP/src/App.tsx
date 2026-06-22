@@ -1,43 +1,25 @@
 import { useState, useEffect } from 'react';
 import { Login } from './components/Login';
 import { Dashboard } from './components/Dashboard';
-import { getSupabaseClient } from './utils/supabase/client';
+import { getToken, removeToken } from './config/api';
 
 export default function App() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [checkingSession, setCheckingSession] = useState(true);
 
   useEffect(() => {
-    checkExistingSession();
+    const token = getToken();
+    if (token) setAccessToken(token);
+    setCheckingSession(false);
   }, []);
-
-  const checkExistingSession = async () => {
-    try {
-      const supabase = getSupabaseClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.access_token) {
-        setAccessToken(session.access_token);
-      }
-    } catch (error) {
-      console.error('Error checking session:', error);
-    } finally {
-      setCheckingSession(false);
-    }
-  };
 
   const handleLogin = (token: string) => {
     setAccessToken(token);
   };
 
-  const handleLogout = async () => {
-    try {
-      const supabase = getSupabaseClient();
-      await supabase.auth.signOut();
-      setAccessToken(null);
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
+  const handleLogout = () => {
+    removeToken();
+    setAccessToken(null);
   };
 
   if (checkingSession) {
