@@ -1,8 +1,10 @@
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
+import { useSiteContent } from '../context/SiteContentContext';
 
 export function Home() {
+  const c = useSiteContent('home');
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -23,7 +25,7 @@ export function Home() {
             </h1>
             <div className="h-px bg-gradient-to-r from-transparent via-[#d4a017] to-transparent w-full mb-8"></div>
             <p className="text-xl md:text-2xl text-gray-300 mb-10 tracking-[0.15em] uppercase">
-              Underground dal 1998
+              {c.hero_sottotitolo}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/eventi">
@@ -46,14 +48,11 @@ export function Home() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center border-2 border-[#d4a017] p-12 md:p-20 bg-black/60 backdrop-blur-sm shadow-2xl">
             <h2 className="text-4xl md:text-6xl uppercase tracking-[0.2em] text-[#d4a017] mb-6">
-              Unisciti a Noi
+              {c.cta_titolo}
             </h2>
             <div className="h-px w-32 bg-[#d4a017] mx-auto mb-8"></div>
-            <p className="text-gray-400 mb-4 leading-relaxed text-lg md:text-xl">
-              Diventa parte della scena underground
-            </p>
             <p className="text-gray-500 mb-12 leading-relaxed max-w-2xl mx-auto">
-              Chiunque condivide i nostri ideali di antifascismo, transfemminismo, ecologia e DIY può diventare socio tesserato gratuitamente e partecipare attivamente a Ekidna APS.
+              {c.cta_testo}
             </p>
             <Link to="/iscriviti">
               <Button className="bg-[#d4a017] hover:bg-[#b8860b] text-black border border-[#d4a017] px-12 py-7 uppercase tracking-[0.15em] shadow-lg text-lg">

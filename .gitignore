@@ -17,6 +17,15 @@ Thumbs.db
 # Docker volumes
 postgres_data/
 
+# Uploaded files (managed on server, not in git)
+backend/public/uploads/
+
+# Temp files
+backend/tmp/
+
+# Tessera assets (copy manually to server)
+backend/assets/
+
 # Build output
 MVP/build/
 website/build/

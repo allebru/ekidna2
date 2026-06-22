@@ -76,11 +76,11 @@ const validateQueryParams = [
 
   query('limit')
     .optional()
-    .isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+    .isInt({ min: 1, max: 1000 }).withMessage('Limit must be between 1 and 1000'),
 
   query('status')
     .optional()
-    .isIn(['active', 'deleted', 'pending']).withMessage('Invalid status'),
+    .isIn(['active', 'deleted', 'pending', 'all']).withMessage('Invalid status'),
 
   query('subscription_year')
     .optional()

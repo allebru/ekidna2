@@ -1,23 +1,16 @@
-const { Pool } = require('pg');
+const mysql = require('mysql2/promise');
 
-const pool = new Pool({
+const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
+  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 3306,
   database: process.env.DB_NAME || 'ekidna_db',
   user: process.env.DB_USER || 'ekidna_user',
   password: process.env.DB_PASSWORD,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
-
-pool.on('connect', () => {
-  console.log('Database connection established');
-});
-
-pool.on('error', (err) => {
-  console.error('Unexpected database error:', err);
-  process.exit(-1);
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  dateStrings: true,
+  charset: 'utf8mb4',
 });
 
 module.exports = pool;

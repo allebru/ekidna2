@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
+const path = require('path');
 const pool = require('./config/database');
 const emailService = require('./services/emailService');
 const routes = require('./routes');
@@ -43,6 +44,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Serve uploaded files as static
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+
 // API routes
 app.use('/api', routes);
 
@@ -55,14 +59,11 @@ app.use(errorHandler);
 // Database connection test
 async function testDatabaseConnection() {
   try {
-    const client = await pool.connect();
+    const connection = await pool.getConnection();
+    const [rows] = await connection.query('SELECT NOW() AS now');
     console.log('✓ Database connected successfully');
-
-    // Test query
-    const result = await client.query('SELECT NOW()');
-    console.log('✓ Database query test successful:', result.rows[0].now);
-
-    client.release();
+    console.log('✓ Database query test successful:', rows[0].now);
+    connection.release();
     return true;
   } catch (error) {
     console.error('✗ Database connection failed:', error.message);
@@ -84,7 +85,7 @@ async function initializeEmailService() {
 function gracefulShutdown() {
   console.log('\nShutting down gracefully...');
 
-  pool.end(() => {
+  pool.end().then(() => {
     console.log('✓ Database pool closed');
     process.exit(0);
   });

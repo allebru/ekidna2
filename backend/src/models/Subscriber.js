@@ -1,191 +1,109 @@
 const pool = require('../config/database');
 
 class Subscriber {
-  // Create a new subscriber
   static async create(data) {
     const { name, email, phone, address, subscription_year, notes } = data;
-
-    const result = await pool.query(
-      `INSERT INTO subscribers (name, email, phone, address, subscription_year, notes, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING *`,
+    const [result] = await pool.execute(
+      'INSERT INTO subscribers (name, email, phone, address, subscription_year, notes, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [name, email || null, phone || null, address || null, subscription_year, notes || null, 'active']
     );
-
-    return result.rows[0];
+    return Subscriber.findById(result.insertId);
   }
 
-  // Get all subscribers with pagination and filters
   static async findAll(filters = {}) {
-    const {
-      page = 1,
-      limit = 50,
-      status = 'active',
-      subscription_year,
-      search
-    } = filters;
-
-    const offset = (page - 1) * limit;
-    let query = `
-      SELECT *
-      FROM subscribers
-      WHERE 1=1
-    `;
+    const { page = 1, limit = 50, status = 'active', subscription_year, search } = filters;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    let where = 'WHERE 1=1';
     const params = [];
-    let paramCount = 1;
 
-    // Filter by status
-    if (status) {
-      query += ` AND status = $${paramCount}`;
-      params.push(status);
-      paramCount++;
-    }
+    if (status && status !== 'all') { where += ' AND status = ?'; params.push(status); }
+    if (subscription_year) { where += ' AND subscription_year = ?'; params.push(subscription_year); }
+    if (search) { where += ' AND (name LIKE ? OR email LIKE ?)'; params.push(`%${search}%`, `%${search}%`); }
 
-    // Filter by subscription year
-    if (subscription_year) {
-      query += ` AND subscription_year = $${paramCount}`;
-      params.push(subscription_year);
-      paramCount++;
-    }
+    const [countRows] = await pool.query(`SELECT COUNT(*) AS total FROM subscribers ${where}`, params);
+    const total = parseInt(countRows[0].total);
 
-    // Search by name or email
-    if (search) {
-      query += ` AND (name ILIKE $${paramCount} OR email ILIKE $${paramCount})`;
-      params.push(`%${search}%`);
-      paramCount++;
-    }
-
-    // Get total count
-    const countResult = await pool.query(
-      query.replace('SELECT *', 'SELECT COUNT(*) as total'),
+    const lim = parseInt(limit);
+    const off = parseInt(page) >= 1 ? (parseInt(page) - 1) * lim : 0;
+    const [rows] = await pool.query(
+      `SELECT * FROM subscribers ${where} ORDER BY created_at DESC LIMIT ${lim} OFFSET ${off}`,
       params
     );
-    const total = parseInt(countResult.rows[0].total);
-
-    // Add pagination
-    query += ` ORDER BY created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
-    params.push(limit, offset);
-
-    const result = await pool.query(query, params);
 
     return {
-      data: result.rows,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        totalPages: Math.ceil(total / limit)
-      }
+      data: rows,
+      pagination: { page: parseInt(page), limit: parseInt(limit), total, totalPages: Math.ceil(total / limit) }
     };
   }
 
-  // Get subscriber by ID
   static async findById(id) {
-    const result = await pool.query(
-      'SELECT * FROM subscribers WHERE id = $1',
-      [id]
-    );
-
-    return result.rows[0] || null;
+    const [rows] = await pool.execute('SELECT * FROM subscribers WHERE id = ?', [id]);
+    return rows[0] || null;
   }
 
-  // Get subscriber by email
   static async findByEmail(email) {
-    const result = await pool.query(
-      'SELECT * FROM subscribers WHERE email = $1',
-      [email]
-    );
-
-    return result.rows[0] || null;
+    const [rows] = await pool.execute('SELECT * FROM subscribers WHERE email = ?', [email]);
+    return rows[0] || null;
   }
 
-  // Update subscriber
   static async update(id, data) {
     const { name, email, phone, address, subscription_year, notes } = data;
-
-    const result = await pool.query(
-      `UPDATE subscribers
-       SET name = COALESCE($1, name),
-           email = COALESCE($2, email),
-           phone = COALESCE($3, phone),
-           address = COALESCE($4, address),
-           subscription_year = COALESCE($5, subscription_year),
-           notes = COALESCE($6, notes),
-           updated_at = CURRENT_TIMESTAMP
-       WHERE id = $7 AND status != 'deleted'
-       RETURNING *`,
-      [name, email, phone, address, subscription_year, notes, id]
+    await pool.execute(
+      `UPDATE subscribers SET
+        name = COALESCE(?, name),
+        email = COALESCE(?, email),
+        phone = COALESCE(?, phone),
+        address = COALESCE(?, address),
+        subscription_year = COALESCE(?, subscription_year),
+        notes = COALESCE(?, notes),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND status != 'deleted'`,
+      [name ?? null, email ?? null, phone ?? null, address ?? null, subscription_year ?? null, notes ?? null, id]
     );
-
-    return result.rows[0] || null;
+    return Subscriber.findById(id);
   }
 
-  // Soft delete subscriber
   static async softDelete(id, deletedBy) {
-    const result = await pool.query(
-      `UPDATE subscribers
-       SET status = 'deleted',
-           deleted_at = CURRENT_TIMESTAMP,
-           deleted_by = $1
-       WHERE id = $2 AND status != 'deleted'
-       RETURNING *`,
+    await pool.execute(
+      "UPDATE subscribers SET status = 'deleted', deleted_at = CURRENT_TIMESTAMP, deleted_by = ? WHERE id = ? AND status != 'deleted'",
       [deletedBy, id]
     );
-
-    return result.rows[0] || null;
+    return Subscriber.findById(id);
   }
 
-  // Restore deleted subscriber
   static async restore(id) {
-    const result = await pool.query(
-      `UPDATE subscribers
-       SET status = 'active',
-           deleted_at = NULL,
-           deleted_by = NULL
-       WHERE id = $1 AND status = 'deleted'
-       RETURNING *`,
+    await pool.execute(
+      "UPDATE subscribers SET status = 'active', deleted_at = NULL, deleted_by = NULL WHERE id = ? AND status = 'deleted'",
       [id]
     );
-
-    return result.rows[0] || null;
+    return Subscriber.findById(id);
   }
 
-  // Hard delete subscriber (permanent)
   static async hardDelete(id) {
-    const result = await pool.query(
-      'DELETE FROM subscribers WHERE id = $1 RETURNING id',
-      [id]
-    );
-
-    return result.rows[0] || null;
+    const [result] = await pool.execute('DELETE FROM subscribers WHERE id = ?', [id]);
+    return result.affectedRows > 0 ? { id } : null;
   }
 
-  // Get statistics
   static async getStats() {
-    const result = await pool.query(`
+    const [rows] = await pool.execute(`
       SELECT
-        COUNT(*) FILTER (WHERE status = 'active') as active_count,
-        COUNT(*) FILTER (WHERE status = 'deleted') as deleted_count,
-        COUNT(*) FILTER (WHERE status = 'pending') as pending_count,
-        COUNT(DISTINCT subscription_year) as total_years,
-        MAX(subscription_year) as latest_year,
-        COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as last_30_days
+        SUM(status = 'active') AS active_count,
+        SUM(status = 'deleted') AS deleted_count,
+        SUM(status = 'pending') AS pending_count,
+        COUNT(DISTINCT subscription_year) AS total_years,
+        MAX(subscription_year) AS latest_year,
+        SUM(created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS last_30_days
       FROM subscribers
     `);
-
-    return result.rows[0];
+    return rows[0];
   }
 
-  // Get subscribers by year
   static async getByYear(year) {
-    const result = await pool.query(
-      `SELECT * FROM subscribers
-       WHERE subscription_year = $1 AND status = 'active'
-       ORDER BY created_at DESC`,
+    const [rows] = await pool.execute(
+      "SELECT * FROM subscribers WHERE subscription_year = ? AND status = 'active' ORDER BY created_at DESC",
       [year]
     );
-
-    return result.rows;
+    return rows;
   }
 }
 

@@ -1,6 +1,10 @@
 import { Button } from './ui/button';
+import { useSiteContent } from '../context/SiteContentContext';
 
 export function Contatti() {
+  const c = useSiteContent('contatti');
+  const tel = c.telefono?.replace(/\s/g, '') ?? '';
+  const telWa = tel.replace('+', '');
   return (
     <div className="min-h-screen pt-24 md:pt-32 pb-12">
       <div className="container mx-auto px-4">
@@ -22,56 +26,36 @@ export function Contatti() {
               Collabora con Ekidna
             </h2>
             <div className="h-px w-24 bg-[#d4a017] mb-8"></div>
-            <p className="text-gray-400 leading-relaxed">
-              Ekidna è uno spazio aperto ad ogni proposta, se hai una band e ti piacerebbe suonare da noi, se sei un'agenzia e vuoi proporci il tuo rooster, se hai un'idea che vorresti realizzare in Ekidna, scrivici! Cerchiamo di rispondere a tutt3 e di dare spazio a tutt3.
-            </p>
+            <p className="text-gray-400 leading-relaxed">{c.intro_testo}</p>
           </div>
 
           {/* Contact Methods */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
             {/* Email */}
-            <a
-              href="mailto:ekidnacarpi@gmail.com"
-              className="bg-zinc-950 border border-[#d4a017]/30 hover:border-[#d4a017] hover:shadow-xl transition-all p-8 group"
-            >
+            <a href={`mailto:${c.email}`} className="bg-zinc-950 border border-[#d4a017]/30 hover:border-[#d4a017] hover:shadow-xl transition-all p-8 group">
               <h3 className="text-lg text-[#d4a017] mb-3 uppercase tracking-[0.15em]">Email</h3>
               <div className="h-px w-12 bg-[#d4a017] mb-4"></div>
-              <p className="text-gray-400 break-all">ekidnacarpi@gmail.com</p>
+              <p className="text-gray-400 break-all">{c.email}</p>
             </a>
 
-            {/* WhatsApp / SMS */}
-            <a
-              href="https://wa.me/393716307881"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-zinc-950 border border-[#d4a017]/30 hover:border-[#d4a017] hover:shadow-xl transition-all p-8 group"
-            >
+            <a href={`https://wa.me/${telWa}`} target="_blank" rel="noopener noreferrer" className="bg-zinc-950 border border-[#d4a017]/30 hover:border-[#d4a017] hover:shadow-xl transition-all p-8 group">
               <h3 className="text-lg text-[#d4a017] mb-3 uppercase tracking-[0.15em]">WhatsApp / SMS</h3>
               <div className="h-px w-12 bg-[#d4a017] mb-4"></div>
-              <p className="text-gray-400">+39 371 630 7881</p>
+              <p className="text-gray-400">{c.telefono}</p>
             </a>
 
-            {/* Phone */}
-            <a
-              href="tel:+393716307881"
-              className="bg-zinc-950 border border-[#d4a017]/30 hover:border-[#d4a017] hover:shadow-xl transition-all p-8 group"
-            >
+            <a href={`tel:${tel}`} className="bg-zinc-950 border border-[#d4a017]/30 hover:border-[#d4a017] hover:shadow-xl transition-all p-8 group">
               <h3 className="text-lg text-[#d4a017] mb-3 uppercase tracking-[0.15em]">Telefono</h3>
               <div className="h-px w-12 bg-[#d4a017] mb-4"></div>
-              <p className="text-gray-400">+39 371 630 7881</p>
+              <p className="text-gray-400">{c.telefono}</p>
             </a>
 
-            {/* Social */}
             <div className="bg-zinc-950 border border-[#d4a017]/30 p-8">
               <h3 className="text-lg text-[#d4a017] mb-3 uppercase tracking-[0.15em]">Social Media</h3>
               <div className="h-px w-12 bg-[#d4a017] mb-4"></div>
               <div className="flex space-x-6">
-                <a href="#" className="text-gray-400 hover:text-[#d4a017] transition-colors uppercase tracking-wider text-sm">
-                  Facebook
-                </a>
-                <a href="#" className="text-gray-400 hover:text-[#d4a017] transition-colors uppercase tracking-wider text-sm">
-                  Instagram
-                </a>
+                {c.facebook_url && <a href={c.facebook_url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#d4a017] transition-colors uppercase tracking-wider text-sm">Facebook</a>}
+                {c.instagram_url && <a href={c.instagram_url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#d4a017] transition-colors uppercase tracking-wider text-sm">Instagram</a>}
               </div>
             </div>
           </div>
@@ -94,7 +78,7 @@ export function Contatti() {
                 asChild
                 className="bg-[#d4a017] hover:bg-[#b8860b] text-black border border-[#d4a017] uppercase tracking-[0.15em] shadow-lg"
               >
-                <a href="mailto:ekidnacarpi@gmail.com">
+                <a href={`mailto:${c.email}`}>
                   Scrivici
                 </a>
               </Button>
@@ -103,7 +87,7 @@ export function Contatti() {
                 variant="outline"
                 className="border border-[#d4a017] text-[#d4a017] hover:bg-[#d4a017] hover:text-black uppercase tracking-[0.15em]"
               >
-                <a href="https://wa.me/393716307881" target="_blank" rel="noopener noreferrer">
+                <a href={`https://wa.me/${telWa}`} target="_blank" rel="noopener noreferrer">
                   WhatsApp
                 </a>
               </Button>

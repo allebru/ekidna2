@@ -19,6 +19,7 @@ export function Iscriviti() {
     provincia: '',
     motivazione: '',
     accettaTermini: false,
+    accettaPrivacy: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -57,6 +58,7 @@ export function Iscriviti() {
           provincia: '',
           motivazione: '',
           accettaTermini: false,
+          accettaPrivacy: false,
         });
       } else {
         setSubmitStatus('error');
@@ -275,6 +277,24 @@ export function Iscriviti() {
                 </Label>
               </div>
 
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="accettaPrivacy"
+                  checked={formData.accettaPrivacy}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, accettaPrivacy: checked as boolean }))
+                  }
+                  className="border border-[#d4a017]/30 data-[state=checked]:bg-[#d4a017] data-[state=checked]:border-[#d4a017]"
+                />
+                <Label htmlFor="accettaPrivacy" className="text-gray-400 text-sm leading-relaxed cursor-pointer">
+                  Ho letto e accetto la{' '}
+                  <a href="#/privacy" target="_blank" className="text-[#d4a017] hover:underline">
+                    Privacy Policy
+                  </a>{' '}
+                  e acconsento al trattamento dei miei dati personali per la gestione dell'iscrizione *
+                </Label>
+              </div>
+
               {/* Submit Status Messages */}
               {submitStatus === 'success' && (
                 <div className="bg-black border border-green-600 p-4 text-green-500 text-sm uppercase tracking-wider">
@@ -290,7 +310,7 @@ export function Iscriviti() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={!formData.accettaTermini || isSubmitting}
+                disabled={!formData.accettaTermini || !formData.accettaPrivacy || isSubmitting}
                 className="w-full bg-[#d4a017] hover:bg-[#b8860b] text-black py-6 uppercase tracking-[0.15em] disabled:opacity-50 disabled:cursor-not-allowed border border-[#d4a017] shadow-lg"
               >
                 {isSubmitting ? 'Invio...' : 'Invia'}

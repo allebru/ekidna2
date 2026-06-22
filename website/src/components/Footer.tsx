@@ -63,7 +63,15 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-[#d4a017]/30 pt-8 text-center">
+        <div className="border-t border-[#d4a017]/30 pt-8 text-center space-y-3">
+          <div className="flex justify-center gap-6">
+            <Link to="/privacy" className="text-gray-600 hover:text-[#d4a017] text-xs uppercase tracking-wider transition-colors">
+              Privacy Policy
+            </Link>
+            <Link to="/privacy#cookie" className="text-gray-600 hover:text-[#d4a017] text-xs uppercase tracking-wider transition-colors">
+              Cookie Policy
+            </Link>
+          </div>
           <p className="text-gray-600 text-sm uppercase tracking-wider">
             © {new Date().getFullYear()} Ekidna APS - Via Livorno 9, 41012 Carpi (MO)
           </p>
