@@ -4,6 +4,8 @@
   import path from 'path';
 
   export default defineConfig({
+    // Servito sotto ekidnacarpi.it/admin → gli asset devono puntare a /admin/
+    base: '/admin/',
     plugins: [react()],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],

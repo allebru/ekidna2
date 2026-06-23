@@ -17,7 +17,20 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Security middleware
-app.use(helmet());
+// CSP su misura: i frontend serviti da Express usano asset same-origin,
+// Google Fonts (Space Grotesk) e stili inline (Tailwind/React).
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'"],
+    },
+  },
+}));
 
 // CORS configuration — allow all localhost ports in dev, restrict to FRONTEND_URL in prod
 app.use(cors({
@@ -50,7 +63,23 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 // API routes
 app.use('/api', routes);
 
-// 404 handler
+// ---- Static frontends (produzione): un solo dominio per sito + MVP ----
+const websiteDir = path.join(__dirname, '../../website/build');
+const mvpDir = path.join(__dirname, '../../MVP/build');
+
+// App gestionale (MVP) sotto /admin
+app.use('/admin', express.static(mvpDir));
+app.get('/admin/*', (req, res) => res.sendFile(path.join(mvpDir, 'index.html')));
+
+// Sito pubblico alla root
+app.use(express.static(websiteDir));
+
+// SPA fallback del sito pubblico: tutto ciò che NON è /api o /uploads → index.html
+app.get(/^(?!\/(?:api|uploads)\/).*/, (req, res) => {
+  res.sendFile(path.join(websiteDir, 'index.html'));
+});
+
+// 404 handler (raggiunto solo da /api/* e /uploads/* non trovati)
 app.use(notFoundHandler);
 
 // Error handler
