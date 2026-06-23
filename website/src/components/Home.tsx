@@ -1,4 +1,3 @@
-import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
 import { useSiteContent } from '../context/SiteContentContext';
@@ -10,19 +9,22 @@ export function Home() {
       {/* Hero Section */}
       <section className="relative h-[80vh] md:h-[90vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <ImageWithFallback
-            src="https://images.unsplash.com/photo-1759137538239-60e0b1e796fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1bmRlcmdyb3VuZCUyMGNvbmNlcnQlMjBwdW5rfGVufDF8fHx8MTc2MDY5MDcyOHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-            alt="Underground Concert"
+          <img
+            src="/img/home-hero.jpg"
+            alt="Concerto underground all'Associazione Ekidna"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/70 to-black"></div>
         </div>
-        
+
         <div className="relative z-10 text-center px-4 max-w-5xl">
           <div className="border-2 border-[#d4a017] p-8 md:p-16 bg-black/60 backdrop-blur-sm shadow-2xl">
-            <h1 className="text-6xl md:text-8xl lg:text-9xl uppercase tracking-[0.2em] mb-8">
-              <span className="text-[#d4a017]">EKIDNA</span>
-            </h1>
+            <img
+              src="/logo/ekidna-logo-v.svg"
+              alt="Ekidna"
+              style={{ height: 'clamp(7rem, 18vw, 12rem)' }}
+              className="mx-auto mb-8"
+            />
             <div className="h-px bg-gradient-to-r from-transparent via-[#d4a017] to-transparent w-full mb-8"></div>
             <p className="text-xl md:text-2xl text-gray-300 mb-10 tracking-[0.15em] uppercase">
               {c.hero_sottotitolo}
@@ -43,20 +45,36 @@ export function Home() {
         </div>
       </section>
 
-      {/* Subscription CTA */}
-      <section className="py-20 md:py-32 bg-zinc-950">
-        <div className="container mx-auto px-4">
+      {/* Tesseramento CTA */}
+      <section className="relative py-20 md:py-32 overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="/img/tesseramento-bg.jpg"
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}></div>
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center border-2 border-[#d4a017] p-12 md:p-20 bg-black/60 backdrop-blur-sm shadow-2xl">
-            <h2 className="text-4xl md:text-6xl uppercase tracking-[0.2em] text-[#d4a017] mb-6">
+            <img
+              src="/logo/ekidna-icon.svg"
+              alt=""
+              aria-hidden="true"
+              style={{ height: 'clamp(3.5rem, 8vw, 5rem)' }}
+              className="mx-auto mb-8"
+            />
+            <h2 className="text-3xl md:text-5xl uppercase tracking-[0.15em] text-[#d4a017] mb-6">
               {c.cta_titolo}
             </h2>
             <div className="h-px w-32 bg-[#d4a017] mx-auto mb-8"></div>
-            <p className="text-gray-500 mb-12 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-gray-400 mb-12 leading-relaxed max-w-2xl mx-auto">
               {c.cta_testo}
             </p>
             <Link to="/iscriviti">
               <Button className="bg-[#d4a017] hover:bg-[#b8860b] text-black border border-[#d4a017] px-12 py-7 uppercase tracking-[0.15em] shadow-lg text-lg">
-                Iscriviti Gratuitamente
+                Diventa socio/a/ə di Ekidna
               </Button>
             </Link>
           </div>

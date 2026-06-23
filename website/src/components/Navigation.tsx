@@ -11,6 +11,7 @@ export function Navigation() {
     { name: 'Chi Siamo', path: '/chi-siamo' },
     { name: 'Eventi', path: '/eventi' },
     { name: 'Galleria', path: '/galleria' },
+    { name: 'Tesseramento', path: '/iscriviti' },
     { name: 'Dove Siamo', path: '/dove-siamo' },
     { name: 'Contatti', path: '/contatti' },
   ];
@@ -23,14 +24,11 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <div className="relative">
-              <span className="text-2xl md:text-3xl uppercase tracking-[0.25em] text-[#d4a017]">
-                EKIDNA
-              </span>
-              <span className="ml-3 text-xs text-gray-600 uppercase tracking-[0.2em]">
-                APS
-              </span>
-            </div>
+            <img
+              src="/logo/ekidna-logo-h.svg"
+              alt="Ekidna APS"
+              style={{ height: 'clamp(3.25rem, 6vw, 4.25rem)' }}
+            />
           </Link>
 
           {/* Desktop Navigation */}

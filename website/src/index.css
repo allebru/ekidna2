@@ -949,19 +949,19 @@
   }
 
   .border-\[\#d4a017\] {
-    border-color: #d4a017;
+    border-color: #e6332a;
   }
 
   .border-\[\#d4a017\]\/20 {
-    border-color: oklab(73.4969% .0146058 .145484 / .2);
+    border-color: rgb(230 51 42 / .2);
   }
 
   .border-\[\#d4a017\]\/30 {
-    border-color: oklab(73.4969% .0146058 .145484 / .3);
+    border-color: rgb(230 51 42 / .3);
   }
 
   .border-\[\#d4a017\]\/50 {
-    border-color: oklab(73.4969% .0146058 .145484 / .5);
+    border-color: rgb(230 51 42 / .5);
   }
 
   .border-green-600 {
@@ -977,7 +977,7 @@
   }
 
   .bg-\[\#d4a017\] {
-    background-color: #d4a017;
+    background-color: #e6332a;
   }
 
   .bg-background {
@@ -1083,7 +1083,7 @@
   }
 
   .via-\[\#d4a017\] {
-    --tw-gradient-via: #d4a017;
+    --tw-gradient-via: #e6332a;
     --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
     --tw-gradient-stops: var(--tw-gradient-via-stops);
   }
@@ -1322,7 +1322,7 @@
   }
 
   .text-\[\#d4a017\] {
-    color: #d4a017;
+    color: #e6332a;
   }
 
   .text-black {
@@ -1579,25 +1579,25 @@
 
   @media (hover: hover) {
     .hover\:border-\[\#d4a017\]:hover {
-      border-color: #d4a017;
+      border-color: #e6332a;
     }
   }
 
   @media (hover: hover) {
     .hover\:bg-\[\#b8860b\]:hover {
-      background-color: #b8860b;
+      background-color: #c41e17;
     }
   }
 
   @media (hover: hover) {
     .hover\:bg-\[\#d4a017\]:hover {
-      background-color: #d4a017;
+      background-color: #e6332a;
     }
   }
 
   @media (hover: hover) {
     .hover\:bg-\[\#d4a017\]\/5:hover {
-      background-color: oklab(73.4969% .0146058 .145484 / .05);
+      background-color: rgb(230 51 42 / .05);
     }
   }
 
@@ -1645,7 +1645,7 @@
 
   @media (hover: hover) {
     .hover\:text-\[\#d4a017\]:hover {
-      color: #d4a017;
+      color: #e6332a;
     }
   }
 
@@ -1681,7 +1681,7 @@
   }
 
   .focus\:border-\[\#d4a017\]:focus {
-    border-color: #d4a017;
+    border-color: #e6332a;
   }
 
   .focus\:ring-2:focus {
@@ -1778,7 +1778,7 @@
   }
 
   .data-\[state\=checked\]\:border-\[\#d4a017\][data-state="checked"] {
-    border-color: #d4a017;
+    border-color: #e6332a;
   }
 
   .data-\[state\=checked\]\:border-primary[data-state="checked"] {
@@ -1786,7 +1786,7 @@
   }
 
   .data-\[state\=checked\]\:bg-\[\#d4a017\][data-state="checked"] {
-    background-color: #d4a017;
+    background-color: #e6332a;
   }
 
   .data-\[state\=checked\]\:bg-primary[data-state="checked"] {
@@ -2281,9 +2281,9 @@ body:before {
 }
 
 :root {
-  --ekidna-yellow: #d4a017;
-  --ekidna-yellow-dark: #b8860b;
-  --ekidna-yellow-light: #daa520;
+  --ekidna-yellow: #e6332a;
+  --ekidna-yellow-dark: #c41e17;
+  --ekidna-yellow-light: #ec5249;
 }
 
 @property --tw-translate-x {
@@ -2559,3 +2559,40 @@ body:before {
     transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0) scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0));
   }
 }
+
+/* ==========================================================================
+   Ekidna — Typography (Space Grotesk) & brand overrides
+   ========================================================================== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+nav a,
+button,
+.button {
+  font-weight: 500;
+}
+
+/* Ekidna brand color helpers (Space Grotesk red) */
+:root {
+  --ekidna-red: #e6332a;
+  --ekidna-red-dark: #c41e17;
+}
+

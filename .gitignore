@@ -28,7 +28,7 @@ backend/assets/
 
 # Build output
 MVP/build/
-website/build/
+# website/build/ is committed: Hostinger serves these static files via Git deploy
 
 # Lock files (generated)
 package-lock.json

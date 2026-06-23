@@ -13,8 +13,15 @@ export function DoveSiamo() {
           </div>
         </div>
 
-        {/* Map placeholder */}
+        {/* Venue photo */}
         <div className="max-w-4xl mx-auto mb-16">
+          <div className="border-2 border-[#d4a017] mb-8 overflow-hidden shadow-2xl">
+            <img
+              src="/img/ekidna-luogo.jpg"
+              alt="La sede di Associazione Ekidna a San Martino sulla Secchia, Carpi"
+              className="w-full h-auto"
+            />
+          </div>
           <div className="border border-[#d4a017]/30 p-12 md:p-16 text-center bg-zinc-950/50 shadow-xl">
             <p className="text-gray-400 mb-4 uppercase tracking-wider">
               Ex scuola elementare di San Martino sulla Secchia

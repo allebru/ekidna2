@@ -1,31 +1,60 @@
 import { Button } from './ui/button';
 
+type EventItem = {
+  id: number;
+  title: string;
+  dateLabel: string;
+  genre: string;
+  image: string;
+  description: string;
+  lineup?: string[];
+  info?: string[];
+  link?: string;
+};
+
 export function Eventi() {
-  // Mock events data - will be updated later
-  const events = [
+  const events: EventItem[] = [
     {
       id: 1,
-      title: 'Metal Night',
-      date: '2025-10-25',
-      time: '21:00',
-      genre: 'Metal',
-      description: 'Una serata dedicata al metal con band locali e internazionali',
+      title: 'Rottura del Silenzio — Ed. 27',
+      dateLabel: '25 – 28 Giugno 2026',
+      genre: 'Festival',
+      image: '/img/eventi/rottura-del-silenzio-27.jpg',
+      description:
+        '27 anni di rumore, indipendenza e voglia di stare insieme. Rottura del Silenzio torna nel giardino di Associazione Ekidna: quattro giorni di concerti, zone distro, proiezioni e installazioni.',
+      lineup: [
+        'GIO 25/06 (free entry) — Warm Up: docufilm “Uzeda – Do It Yourself” di Maria Arena',
+        'VEN 26/06 — Sick Tamburo · Tense-Up · Adriana',
+        'SAB 27/06 — Kaos & Egreen · Cigno · Browbeat · Give Vent · H-Strychnine · Nube · 4Tracks',
+        'DOM 28/06 — Uzeda · Three Second Kiss · The Jackson Pollock · Bruuno · Fosca · To Die On Ice · Requiem for Paola P.',
+      ],
+      info: [
+        'Dove: Via Livorno 9, Carpi (MO) — Associazione Ekidna',
+        'Ingresso: 15€ al giorno (giovedì gratuito)',
+        'Biglietti disponibili solo in cassa (no prevendite online)',
+        'Cena, food & drinks, stage esterno e zona distro per tutta la durata del festival',
+      ],
+      link: 'https://www.facebook.com/events/1001945245623495',
     },
     {
       id: 2,
-      title: 'Punk & Hardcore Fest',
-      date: '2025-11-08',
-      time: '20:00',
-      genre: 'Punk',
-      description: 'Festival punk con diverse band dalla scena underground italiana',
-    },
-    {
-      id: 3,
-      title: 'Tekno Sound System',
-      date: '2025-11-22',
-      time: '22:00',
-      genre: 'Tekno',
-      description: 'Notte di musica tekno con sound system e DJ set',
+      title: 'The End of Impact Fest',
+      dateLabel: '10 – 12 Luglio 2026',
+      genre: 'Festival',
+      image: '/img/eventi/end-of-impact-fest.jpg',
+      description:
+        "L'ultima edizione di Impact Fest. Tre giorni, due palchi, distro & zine area, talk & market, free camping, vegan food, zones of silence, awareness team e workshop. See you at Associazione Ekidna.",
+      lineup: [
+        'VEN 10/07 — Emma Goldman · L’Idylle · Put Pùrana · Older Friends · Ineptitude · Uragano · Casamatta · Ghostboycoma',
+        'SAB 11/07 — Ostraca · Kokeshi · Powerplant · Vibora · Shizune · Oakhands · Calathea · Shooting Daggers · Cady · Emes · Plastic Bags For Helmets · Dagerman · Kadreka · Foscø · Laurie Bird · Nubifragio · Ghostboycoma',
+        'DOM 12/07 — Moshimoshi · Nivra · Verogna · Falesia · Hatsu No Hado · Marcovaldo · Nirano · Legni Vecchi · Vote For Pedro · Flâneur · Yarostan · Lumière',
+      ],
+      info: [
+        'Dove: Via Livorno 9, Carpi (MO) — Associazione Ekidna',
+        '2 live stages / distro & zine area / talk & market / free camping / vegan food',
+        'Full pass ticket disponibile online',
+      ],
+      link: 'https://www.facebook.com/events/1346447074184921',
     },
   ];
 
@@ -39,18 +68,23 @@ export function Eventi() {
           </h1>
           <div className="h-px w-32 bg-[#d4a017] mx-auto mb-6"></div>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Prossimi concerti e eventi underground
+            Prossimi concerti e festival underground all'Associazione Ekidna
           </p>
         </div>
 
         {/* Events List */}
         {events.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {events.map((event) => (
               <div
                 key={event.id}
-                className="bg-zinc-950 border border-[#d4a017]/30 hover:border-[#d4a017] hover:shadow-xl transition-all group"
+                className="bg-zinc-950 border border-[#d4a017]/30 hover:border-[#d4a017] hover:shadow-xl transition-all overflow-hidden"
               >
+                <img
+                  src={event.image}
+                  alt={`Locandina ${event.title}`}
+                  className="w-full h-auto"
+                />
                 <div className="p-8">
                   <div className="flex items-start justify-between mb-6">
                     <span className="inline-block border border-[#d4a017]/50 text-[#d4a017] px-3 py-1 text-xs uppercase tracking-[0.15em]">
@@ -58,28 +92,45 @@ export function Eventi() {
                     </span>
                   </div>
 
-                  <h3 className="text-2xl text-[#d4a017] mb-6 uppercase tracking-[0.15em]">
+                  <h3 className="text-2xl text-[#d4a017] mb-4 uppercase tracking-[0.15em]">
                     {event.title}
                   </h3>
 
-                  <div className="space-y-3 mb-6 text-gray-500 text-sm uppercase tracking-wider">
-                    <div>
-                      {new Date(event.date).toLocaleDateString('it-IT', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
-                    </div>
-                    <div>
-                      Ore {event.time}
-                    </div>
+                  <div className="mb-6 text-gray-500 text-sm uppercase tracking-wider">
+                    {event.dateLabel}
                   </div>
 
                   <p className="text-gray-400 text-sm mb-6 leading-relaxed">
                     {event.description}
                   </p>
 
-                  <div className="h-px bg-[#d4a017] w-full"></div>
+                  {event.lineup && (
+                    <div className="mb-6 space-y-2">
+                      {event.lineup.map((line, i) => (
+                        <p key={i} className="text-gray-400 text-sm leading-relaxed">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {event.info && (
+                    <div className="mb-6 space-y-2 border-t border-[#d4a017]/20 pt-8">
+                      {event.info.map((line, i) => (
+                        <p key={i} className="text-gray-500 text-sm leading-relaxed">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {event.link && (
+                    <a href={event.link} target="_blank" rel="noopener noreferrer">
+                      <Button className="bg-[#d4a017] hover:bg-[#b8860b] text-black border border-[#d4a017] px-10 py-6 uppercase tracking-[0.15em] shadow-lg">
+                        Info evento
+                      </Button>
+                    </a>
+                  )}
                 </div>
               </div>
             ))}
@@ -101,9 +152,11 @@ export function Eventi() {
           <p className="text-gray-400 mb-8 leading-relaxed">
             Hai una band o un'idea per un evento? Contattaci!
           </p>
-          <Button className="bg-[#d4a017] hover:bg-[#b8860b] text-black border border-[#d4a017] px-10 py-6 uppercase tracking-[0.15em] shadow-lg">
-            Scrivici
-          </Button>
+          <a href="#/contatti">
+            <Button className="bg-[#d4a017] hover:bg-[#b8860b] text-black border border-[#d4a017] px-10 py-6 uppercase tracking-[0.15em] shadow-lg">
+              Scrivici
+            </Button>
+          </a>
         </div>
       </div>
     </div>

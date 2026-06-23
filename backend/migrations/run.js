@@ -7,9 +7,9 @@ const bcrypt = require('bcryptjs');
 
 const DEFAULT_CONTENT = [
   // home
-  { page: 'home', key: 'hero_sottotitolo',  type: 'text',     label: 'Hero — Sottotitolo',        value: 'Underground dal 1998', order: 1 },
-  { page: 'home', key: 'cta_titolo',        type: 'text',     label: 'CTA — Titolo',              value: 'Unisciti a Noi', order: 2 },
-  { page: 'home', key: 'cta_testo',         type: 'textarea', label: 'CTA — Testo',               value: 'Chiunque condivide i nostri ideali di antifascismo, transfemminismo, ecologia e DIY può diventare socio tesserato gratuitamente e partecipare attivamente a Ekidna APS.', order: 3 },
+  { page: 'home', key: 'hero_sottotitolo',  type: 'text',     label: 'Hero — Sottotitolo',        value: 'Spazio autogestito, culturale e indipendente dal 1998', order: 1 },
+  { page: 'home', key: 'cta_titolo',        type: 'text',     label: 'CTA — Titolo',              value: 'Diventa socio/a/ə di Ekidna', order: 2 },
+  { page: 'home', key: 'cta_testo',         type: 'textarea', label: 'CTA — Testo',               value: "L'Associazione Ekidna è uno spazio autogestito, culturale e indipendente. Per partecipare alle nostre attività, ai concerti, ai nostri eventi e frequentare i nostri spazi è necessario tesserarsi. La tessera associativa è completamente gratuita, ha validità per l'anno in corso e l'adesione comporta l'accettazione dello Statuto dell'Associazione.", order: 3 },
   // chi_siamo
   { page: 'chi_siamo', key: 'storia_testo', type: 'textarea', label: 'La Nostra Storia',          value: 'Ekidna nasce nel 1998 da alcune persone che, volendo accomunare i loro interessi per la musica e i valori della cultura underground, hanno creato un\'associazione non a scopo di lucro dove chi vuole può incontrarsi liberamente per condividere gli ideali di antifascismo, transfemminismo, ecologia, DIY e promozione dell\'arte a livello locale (musica, teatro, arti figurative…).', order: 1 },
   { page: 'chi_siamo', key: 'sede_testo',   type: 'textarea', label: 'La Sede — Testo',           value: 'Dapprima in maniera errante spostandosi nella bassa modenese, Ekidna si stabilisce nell\'ex scuola elementare di San Martino sulla Secchia, concessa in comodato d\'uso gratuito dal Comune di Carpi. L\'edificio diroccato viene quindi ristrutturato dalle volontari3 e riconvertito in una struttura funzionante capace di ospitare eventi e laboratori (serigrafia e fotografia).', order: 2 },

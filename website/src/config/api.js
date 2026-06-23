@@ -1,6 +1,10 @@
 // API Configuration for Website (Public subscription form)
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+// Default to a same-origin relative path: in produzione le chiamate /api
+// vengono inoltrate al backend Node dal reverse-proxy (.htaccess).
+// In sviluppo, il proxy di Vite (vite.config) gira /api su localhost:3001.
+// Si può comunque forzare un URL assoluto con VITE_API_BASE_URL.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // Submit subscription form
 export const submitSubscription = async (formData) => {

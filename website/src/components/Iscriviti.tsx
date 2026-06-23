@@ -81,12 +81,19 @@ export function Iscriviti() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16 border-2 border-[#d4a017] p-12 bg-black/60 backdrop-blur-sm shadow-2xl">
-          <h1 className="text-5xl md:text-7xl uppercase tracking-[0.2em] text-[#d4a017] mb-6">
-            Iscriviti
+          <img
+            src="/logo/ekidna-icon.svg"
+            alt=""
+            aria-hidden="true"
+            style={{ height: 'clamp(3.5rem, 8vw, 5rem)' }}
+            className="mx-auto mb-8"
+          />
+          <h1 className="text-4xl md:text-6xl uppercase tracking-[0.15em] text-[#d4a017] mb-6">
+            Diventa socio/a/ə di Ekidna
           </h1>
           <div className="h-px w-32 bg-[#d4a017] mx-auto mb-6"></div>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Diventa socio di Ekidna APS gratuitamente
+            La tessera associativa è completamente gratuita
           </p>
         </div>
 
@@ -94,11 +101,14 @@ export function Iscriviti() {
           {/* Intro */}
           <div className="border border-[#d4a017]/30 p-8 md:p-12 mb-12 bg-zinc-950/50 shadow-xl">
             <h2 className="text-2xl text-[#d4a017] mb-6 uppercase tracking-[0.15em]">
-              Unisciti a Noi
+              Diventa socio/a/ə di Associazione Ekidna
             </h2>
             <div className="h-px w-24 bg-[#d4a017] mb-8"></div>
             <p className="text-gray-400 leading-relaxed mb-6">
-              Chiunque condivide i nostri ideali di antifascismo, transfemminismo, ecologia e DIY può diventare socio tesserato gratuitamente della nostra associazione.
+              L'Associazione Ekidna è uno spazio autogestito, culturale e indipendente. Per partecipare alle nostre attività, ai concerti, ai nostri eventi e frequentare i nostri spazi è necessario tesserarsi.
+            </p>
+            <p className="text-gray-400 leading-relaxed mb-6">
+              La tessera associativa è <span className="text-[#d4a017]">completamente gratuita</span>, ha validità per l'anno in corso e l'adesione comporta l'accettazione dello Statuto dell'Associazione.
             </p>
             <p className="text-gray-500 text-sm">
               Compila il modulo qui sotto per richiedere la tua tessera associativa gratuita.

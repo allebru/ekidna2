@@ -56,7 +56,7 @@ function EventiEditor({ value, onChange }: { value: string; onChange: (v: string
 }
 
 // ── Galleria editor ──────────────────────────────────────────────
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 function GalleriaEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [items, setItems] = useState<any[]>(() => { try { return JSON.parse(value) || []; } catch { return []; } });

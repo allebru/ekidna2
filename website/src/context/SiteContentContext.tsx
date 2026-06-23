@@ -1,14 +1,14 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { checkAPIHealth } from '../config/api';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // Default fallback content (shown if API is unreachable)
 const DEFAULTS = {
   home: {
-    hero_sottotitolo: 'Underground dal 1998',
-    cta_titolo: 'Unisciti a Noi',
-    cta_testo: 'Chiunque condivide i nostri ideali di antifascismo, transfemminismo, ecologia e DIY può diventare socio tesserato gratuitamente e partecipare attivamente a Ekidna APS.',
+    hero_sottotitolo: 'Spazio autogestito, culturale e indipendente dal 1998',
+    cta_titolo: 'Diventa socio/a/ə di Ekidna',
+    cta_testo: "L'Associazione Ekidna è uno spazio autogestito, culturale e indipendente. Per partecipare alle nostre attività, ai concerti, ai nostri eventi e frequentare i nostri spazi è necessario tesserarsi. La tessera associativa è completamente gratuita, ha validità per l'anno in corso e l'adesione comporta l'accettazione dello Statuto dell'Associazione.",
   },
   chi_siamo: {
     storia_testo: 'Ekidna nasce nel 1998 da alcune persone che, volendo accomunare i loro interessi per la musica e i valori della cultura underground, hanno creato un\'associazione non a scopo di lucro dove chi vuole può incontrarsi liberamente per condividere gli ideali di antifascismo, transfemminismo, ecologia, DIY e promozione dell\'arte a livello locale.',
