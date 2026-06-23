@@ -27,8 +27,9 @@ backend/tmp/
 backend/assets/
 
 # Build output
-# MVP/build/ e website/build/ sono committati: Express li serve come statici
-# (sito pubblico alla root, MVP sotto /admin) sullo stesso dominio.
+# I frontend sono compilati in backend/public/{site,admin} e COMMITTATI:
+# il deploy del solo backend (Express) li serve come statici sullo stesso dominio
+# (sito pubblico alla root, MVP sotto /admin). backend/public/uploads resta ignorato.
 
 # Lock files (generated)
 package-lock.json

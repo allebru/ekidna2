@@ -55,7 +55,9 @@
     },
     build: {
       target: 'esnext',
-      outDir: 'build',
+      // Compilato dentro il backend: Express serve l'app gestionale sotto /admin
+      outDir: '../backend/public/admin',
+      emptyOutDir: true,
     },
     server: {
       port: 3000,

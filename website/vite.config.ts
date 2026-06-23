@@ -51,7 +51,9 @@
     },
     build: {
       target: 'esnext',
-      outDir: 'build',
+      // Compilato dentro il backend: Express serve il sito pubblico alla root
+      outDir: '../backend/public/site',
+      emptyOutDir: true,
     },
     server: {
       port: 3000,

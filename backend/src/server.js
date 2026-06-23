@@ -64,8 +64,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 app.use('/api', routes);
 
 // ---- Static frontends (produzione): un solo dominio per sito + MVP ----
-const websiteDir = path.join(__dirname, '../../website/build');
-const mvpDir = path.join(__dirname, '../../MVP/build');
+const websiteDir = path.join(__dirname, '../public/site');
+const mvpDir = path.join(__dirname, '../public/admin');
 
 // App gestionale (MVP) sotto /admin
 app.use('/admin', express.static(mvpDir));
