@@ -35,16 +35,16 @@ class Subscriber {
   }
 
   static async create(data) {
-    const { email, phone, birth_date, address, city, province, postal_code, subscription_year, notes } = data;
+    const { email, phone, birth_date, birth_place, address, city, province, postal_code, subscription_year, notes } = data;
     const { first_name, last_name } = Subscriber.splitName(data);
     const card_number = data.card_number || (await Subscriber.nextCardNumber());
     const [result] = await pool.execute(
       `INSERT INTO subscribers
-        (first_name, last_name, email, phone, birth_date, address, city, province, postal_code, card_number, subscription_year, notes, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (first_name, last_name, email, phone, birth_date, birth_place, address, city, province, postal_code, card_number, subscription_year, notes, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         first_name, last_name,
-        email || null, phone || null, birth_date || null,
+        email || null, phone || null, birth_date || null, birth_place || null,
         address || null, city || null, province || null, postal_code || null,
         card_number, subscription_year, notes || null, 'active',
       ]

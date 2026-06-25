@@ -7,7 +7,7 @@ class SubscriberController {
   static async create(req, res, next) {
     try {
       const {
-        name, first_name, last_name, email, phone, birth_date,
+        name, first_name, last_name, email, phone, birth_date, birth_place,
         address, city, province, postal_code, subscription_year, notes,
       } = req.body;
 
@@ -25,7 +25,7 @@ class SubscriberController {
       // Create subscriber
       const subscriber = await Subscriber.create({
         name, first_name, last_name,
-        email, phone, birth_date,
+        email, phone, birth_date, birth_place,
         address, city, province, postal_code,
         subscription_year, notes,
       });

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
 import { Checkbox } from './ui/checkbox';
 import { Link } from 'react-router-dom';
 import { submitSubscription } from '../config/api';
@@ -24,18 +23,20 @@ const initialData = {
   giorno: '',
   mese: '',
   anno: '',
+  luogoNascita: '',
   indirizzo: '',
   citta: '',
   cap: '',
   provincia: '',
-  motivazione: '',
+  interesseEventi: false,
+  interesseVolontariato: false,
   accettaTermini: false,
   accettaPrivacy: false,
   website: '', // honeypot anti-bot (nascosto)
 };
 
 type FormData = typeof initialData;
-type Errors = Partial<Record<keyof FormData | 'dataNascita', string>>;
+type Errors = Partial<Record<keyof FormData | 'dataNascita' | 'interessi', string>>;
 
 // Una data reale (non 31/02) e non nel futuro
 function dataValida(y: number, m: number, d: number) {
@@ -87,6 +88,10 @@ export function Iscriviti() {
       e.dataNascita = 'Data di nascita non valida';
     }
 
+    const luogoNascita = formData.luogoNascita.trim();
+    if (!luogoNascita) e.luogoNascita = 'Inserisci il luogo di nascita';
+    else if (luogoNascita.length > 150) e.luogoNascita = 'Luogo di nascita troppo lungo';
+
     if (!indirizzo) e.indirizzo = 'Inserisci l\'indirizzo';
     else if (indirizzo.length < 3) e.indirizzo = 'Indirizzo troppo corto';
 
@@ -97,7 +102,9 @@ export function Iscriviti() {
     if (!provincia) e.provincia = 'Inserisci la provincia';
     else if (!/^[A-Za-z]{2}$/.test(provincia)) e.provincia = 'Sigla provincia: 2 lettere (es. MO)';
 
-    if (formData.motivazione.length > 1000) e.motivazione = 'Massimo 1000 caratteri';
+    if (!formData.interesseEventi && !formData.interesseVolontariato) {
+      e.interessi = 'Seleziona almeno un\'opzione';
+    }
 
     if (!formData.accettaTermini) e.accettaTermini = 'Devi accettare lo statuto';
     if (!formData.accettaPrivacy) e.accettaPrivacy = 'Devi accettare la privacy policy';
@@ -122,6 +129,11 @@ export function Iscriviti() {
       const mm = String(formData.mese).padStart(2, '0');
       const birthDateISO = `${formData.anno}-${mm}-${gg}`; // YYYY-MM-DD per colonna DATE
 
+      // Interessi selezionati → salvati nelle note (lo schema non ha una colonna dedicata)
+      const interessi: string[] = [];
+      if (formData.interesseEventi) interessi.push('Eventi e Iniziative');
+      if (formData.interesseVolontariato) interessi.push('Volontariato');
+
       const subscriptionData = {
         name: `${formData.nome.trim()} ${formData.cognome.trim()}`.trim(), // compatibilità
         first_name: formData.nome.trim(),
@@ -129,12 +141,13 @@ export function Iscriviti() {
         email: formData.email.trim(),
         phone: formData.telefono.trim(),
         birth_date: birthDateISO,
+        birth_place: formData.luogoNascita.trim(),
         address: formData.indirizzo.trim(),
         city: formData.citta.trim(),
         province: formData.provincia.trim().toUpperCase(),
         postal_code: formData.cap.trim(),
         subscription_year: ANNO_CORRENTE,
-        notes: formData.motivazione.trim(),
+        notes: interessi.length ? `Interessi: ${interessi.join(', ')}` : '',
         website: formData.website, // honeypot
       };
 
@@ -280,6 +293,14 @@ export function Iscriviti() {
                 <ErrMsg msg={errors.dataNascita} />
               </div>
 
+              {/* Luogo di nascita */}
+              <div>
+                <Label htmlFor="luogoNascita" className={labelCls}>Luogo di Nascita *</Label>
+                <Input id="luogoNascita" name="luogoNascita" type="text" maxLength={150} autoComplete="off"
+                  value={formData.luogoNascita} onChange={handleChange} className={fieldCls('luogoNascita')} placeholder="Es. Carpi (MO)" />
+                <ErrMsg msg={errors.luogoNascita} />
+              </div>
+
               {/* Indirizzo */}
               <div>
                 <Label htmlFor="indirizzo" className={labelCls}>Indirizzo *</Label>
@@ -310,13 +331,34 @@ export function Iscriviti() {
                 </div>
               </div>
 
-              {/* Motivazione */}
+              {/* Perché vuoi far parte di Ekidna? — almeno una opzione obbligatoria */}
               <div>
-                <Label htmlFor="motivazione" className={labelCls}>Perché vuoi far parte di Ekidna?</Label>
-                <Textarea id="motivazione" name="motivazione" rows={5} maxLength={1000}
-                  value={formData.motivazione} onChange={handleChange}
-                  className={`${fieldCls('motivazione')} resize-none`} placeholder="Raccontaci..." />
-                <ErrMsg msg={errors.motivazione} />
+                <Label className={labelCls}>Perché vuoi far parte di Ekidna? *</Label>
+                <div className="space-y-3 mt-1">
+                  <div className="flex items-start space-x-3">
+                    <Checkbox id="interesseEventi" checked={formData.interesseEventi}
+                      onCheckedChange={(checked) => {
+                        setFormData((prev) => ({ ...prev, interesseEventi: checked as boolean }));
+                        if (errors.interessi) setErrors((prev) => ({ ...prev, interessi: undefined }));
+                      }}
+                      className="border border-[#e6332a]/30 data-[state=checked]:bg-[#e6332a] data-[state=checked]:border-[#e6332a]" />
+                    <Label htmlFor="interesseEventi" className="text-gray-400 text-sm leading-relaxed cursor-pointer">
+                      <span className="text-gray-300">Eventi e Iniziative</span> — partecipare come pubblicə e frequentare il circolo
+                    </Label>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <Checkbox id="interesseVolontariato" checked={formData.interesseVolontariato}
+                      onCheckedChange={(checked) => {
+                        setFormData((prev) => ({ ...prev, interesseVolontariato: checked as boolean }));
+                        if (errors.interessi) setErrors((prev) => ({ ...prev, interessi: undefined }));
+                      }}
+                      className="border border-[#e6332a]/30 data-[state=checked]:bg-[#e6332a] data-[state=checked]:border-[#e6332a]" />
+                    <Label htmlFor="interesseVolontariato" className="text-gray-400 text-sm leading-relaxed cursor-pointer">
+                      <span className="text-gray-300">Volontariə</span> — disponibile a dare una mano dove serve, a seconda delle necessità
+                    </Label>
+                  </div>
+                </div>
+                <ErrMsg msg={errors.interessi} />
               </div>
 
               {/* Consensi */}
