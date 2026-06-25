@@ -142,6 +142,18 @@ async function startServer() {
       process.exit(1);
     }
 
+    // Migrazione automatica (opzionale): se AUTO_MIGRATE=true crea tabelle,
+    // utente admin e contenuti di default all'avvio. Operazione idempotente.
+    if (process.env.AUTO_MIGRATE === 'true') {
+      try {
+        console.log('⏳ AUTO_MIGRATE attivo: eseguo le migrazioni...');
+        await require('../migrations/run')();
+        console.log('✓ Migrazioni completate\n');
+      } catch (err) {
+        console.error('✗ Migrazioni fallite (l\'app parte comunque):', err.message);
+      }
+    }
+
     // Initialize email service (non-blocking)
     await initializeEmailService();
 

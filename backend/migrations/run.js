@@ -95,4 +95,10 @@ async function run() {
   }
 }
 
-run();
+// Eseguito direttamente (`npm run migrate`) → lancia subito.
+// Importato (es. da server.js con AUTO_MIGRATE) → esporta solo la funzione.
+if (require.main === module) {
+  run();
+}
+
+module.exports = run;
