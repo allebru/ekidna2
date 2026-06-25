@@ -72,8 +72,8 @@ export function Home() {
             <p className="text-gray-400 mb-12 leading-relaxed max-w-2xl mx-auto">
               {c.cta_testo}
             </p>
-            <Link to="/iscriviti">
-              <Button className="bg-[#e6332a] hover:bg-[#c41e17] text-black border border-[#e6332a] px-12 py-7 uppercase tracking-[0.15em] shadow-lg text-lg">
+            <Link to="/iscriviti" className="block sm:inline-block">
+              <Button className="w-full sm:w-auto bg-[#e6332a] hover:bg-[#c41e17] text-black border border-[#e6332a] px-6 sm:px-12 py-5 sm:py-7 uppercase tracking-[0.1em] sm:tracking-[0.15em] shadow-lg text-base sm:text-lg whitespace-normal h-auto leading-snug">
                 Diventa socio/a/ə di Ekidna
               </Button>
             </Link>
