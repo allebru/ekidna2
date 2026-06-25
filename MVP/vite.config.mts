@@ -1,12 +1,13 @@
 
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
+  import tailwindcss from '@tailwindcss/vite';
   import path from 'path';
 
   export default defineConfig({
     // Servito sotto ekidnacarpi.it/admin → gli asset devono puntare a /admin/
     base: '/admin/',
-    plugins: [react()],
+    plugins: [react(), tailwindcss()],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {

@@ -7,12 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Save, CheckCircle, AlertCircle, Plus, Trash2, Upload, Loader2 } from 'lucide-react';
 import apiClient, { getToken } from '../config/api';
 
+// Solo le pagine che il sito legge DAVVERO dal CMS.
+// Chi Siamo / Eventi / Galleria / Dove Siamo sono fissi nel frontend
+// (testi, flyer, foto reali) e non passano dal CMS → non vanno mostrati qui.
 const PAGES: { key: string; label: string }[] = [
   { key: 'home', label: 'Home' },
-  { key: 'chi_siamo', label: 'Chi Siamo' },
-  { key: 'eventi', label: 'Eventi' },
-  { key: 'galleria', label: 'Galleria' },
-  { key: 'dove_siamo', label: 'Dove Siamo' },
   { key: 'contatti', label: 'Contatti' },
 ];
 

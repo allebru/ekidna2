@@ -18,46 +18,31 @@ const NAV: { key: DashboardSection; label: string; icon: typeof Users }[] = [
 
 export function Layout({ children, onLogout, section, onSectionChange }: LayoutProps) {
   return (
-    <div style={{ minHeight: '100vh' }} className="bg-background">
+    <div className="min-h-screen bg-background">
       <Header onLogout={onLogout} />
 
-      <div style={{ display: 'flex' }}>
-        {/* Sidebar — always visible */}
-        <aside style={{ width: '180px', flexShrink: 0, minHeight: 'calc(100vh - 4rem)', borderRight: '1px solid rgba(212,160,23,0.2)', paddingTop: '1.5rem' }} className="bg-card/30">
-          <nav style={{ padding: '0 0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      {/* mobile: nav orizzontale sopra + contenuto sotto · desktop: sidebar a sinistra */}
+      <div className="flex flex-col md:flex-row">
+        <aside className="md:w-[180px] md:flex-shrink-0 md:min-h-[calc(100vh-4rem)] bg-card/30 border-b border-primary/20 md:border-b-0 md:border-r md:pt-6">
+          <nav className="flex flex-row md:flex-col gap-1 px-2 md:px-3 py-2 md:py-0">
             {NAV.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
                 onClick={() => onSectionChange(key)}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.625rem 0.75rem',
-                  fontSize: '0.75rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  borderLeft: `2px solid ${section === key ? 'var(--color-primary, #d4a017)' : 'transparent'}`,
-                  color: section === key ? 'var(--color-primary, #d4a017)' : undefined,
-                  background: section === key ? 'rgba(212,160,23,0.1)' : 'transparent',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                  borderTop: 'none',
-                  borderRight: 'none',
-                  borderBottom: 'none',
-                }}
-                className={section === key ? 'text-primary' : 'text-muted-foreground hover:text-primary'}
+                className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-2 md:gap-3 px-3 py-2.5 text-xs uppercase tracking-wider transition-all cursor-pointer border-b-2 md:border-b-0 md:border-l-2 ${
+                  section === key
+                    ? 'border-primary text-primary bg-primary/10'
+                    : 'border-transparent text-muted-foreground hover:text-primary'
+                }`}
               >
                 <Icon size={16} />
-                {label}
+                <span className="whitespace-nowrap">{label}</span>
               </button>
             ))}
           </nav>
         </aside>
 
-        {/* Main content */}
-        <main style={{ flex: 1, padding: '1.5rem 1rem', maxWidth: '64rem' }}>
+        <main className="flex-1 w-full max-w-5xl p-4 md:p-6">
           {children}
         </main>
       </div>

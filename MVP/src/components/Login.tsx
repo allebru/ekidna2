@@ -31,8 +31,8 @@ export function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-2 border-primary">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 overflow-x-hidden">
+      <Card className="w-full max-w-md min-w-0 border-2 border-primary">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
