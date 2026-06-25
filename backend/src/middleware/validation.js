@@ -16,6 +16,13 @@ const validateSubscriber = [
     .notEmpty().withMessage('Name is required')
     .isLength({ min: 2, max: 255 }).withMessage('Name must be between 2 and 255 characters'),
 
+  body('first_name').optional({ checkFalsy: true }).trim().isLength({ max: 100 }).withMessage('First name too long'),
+  body('last_name').optional({ checkFalsy: true }).trim().isLength({ max: 100 }).withMessage('Last name too long'),
+  body('birth_date').optional({ checkFalsy: true }).isISO8601().withMessage('Invalid birth date'),
+  body('city').optional({ checkFalsy: true }).trim().isLength({ max: 100 }).withMessage('City too long'),
+  body('province').optional({ checkFalsy: true }).trim().isLength({ max: 4 }).withMessage('Invalid province'),
+  body('postal_code').optional({ checkFalsy: true }).trim().isLength({ max: 10 }).withMessage('Invalid postal code'),
+
   body('email')
     .optional({ checkFalsy: true })
     .trim()

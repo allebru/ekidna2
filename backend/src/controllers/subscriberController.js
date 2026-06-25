@@ -6,7 +6,10 @@ class SubscriberController {
   // Create new subscriber (from website form)
   static async create(req, res, next) {
     try {
-      const { name, email, phone, address, subscription_year, notes } = req.body;
+      const {
+        name, first_name, last_name, email, phone, birth_date,
+        address, city, province, postal_code, subscription_year, notes,
+      } = req.body;
 
       // Check if email already exists (if provided)
       if (email) {
@@ -21,12 +24,10 @@ class SubscriberController {
 
       // Create subscriber
       const subscriber = await Subscriber.create({
-        name,
-        email,
-        phone,
-        address,
-        subscription_year,
-        notes
+        name, first_name, last_name,
+        email, phone, birth_date,
+        address, city, province, postal_code,
+        subscription_year, notes,
       });
 
       // Send confirmation email (async, don't wait)

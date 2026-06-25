@@ -119,15 +119,21 @@ export function Iscriviti() {
     try {
       const gg = String(formData.giorno).padStart(2, '0');
       const mm = String(formData.mese).padStart(2, '0');
-      const dataIt = `${gg}/${mm}/${formData.anno}`;
+      const birthDateISO = `${formData.anno}-${mm}-${gg}`; // YYYY-MM-DD per colonna DATE
 
       const subscriptionData = {
-        name: `${formData.nome.trim()} ${formData.cognome.trim()}`.trim(),
+        name: `${formData.nome.trim()} ${formData.cognome.trim()}`.trim(), // compatibilità
+        first_name: formData.nome.trim(),
+        last_name: formData.cognome.trim(),
         email: formData.email.trim(),
         phone: formData.telefono.trim(),
-        address: `${formData.indirizzo.trim()}, ${formData.citta.trim()}, ${formData.cap.trim()} ${formData.provincia.trim().toUpperCase()}`,
+        birth_date: birthDateISO,
+        address: formData.indirizzo.trim(),
+        city: formData.citta.trim(),
+        province: formData.provincia.trim().toUpperCase(),
+        postal_code: formData.cap.trim(),
         subscription_year: ANNO_CORRENTE,
-        notes: `Data di nascita: ${dataIt}\n\nMotivazione: ${formData.motivazione.trim()}`.trim(),
+        notes: formData.motivazione.trim(),
         website: formData.website, // honeypot
       };
 
