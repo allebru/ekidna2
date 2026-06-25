@@ -4,6 +4,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Checkbox } from './ui/checkbox';
+import { Link } from 'react-router-dom';
 import { submitSubscription } from '../config/api';
 
 const MESI = [
@@ -344,7 +345,7 @@ export function Iscriviti() {
                     className="border border-[#e6332a]/30 data-[state=checked]:bg-[#e6332a] data-[state=checked]:border-[#e6332a]" />
                   <Label htmlFor="accettaPrivacy" className="text-gray-400 text-sm leading-relaxed cursor-pointer">
                     Ho letto e accetto la{' '}
-                    <a href="#/privacy" target="_blank" className="text-[#e6332a] hover:underline">Privacy Policy</a>{' '}
+                    <Link to="/privacy" target="_blank" className="text-[#e6332a] hover:underline">Privacy Policy</Link>{' '}
                     e acconsento al trattamento dei miei dati personali per la gestione dell'iscrizione *
                   </Label>
                 </div>

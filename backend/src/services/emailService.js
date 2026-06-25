@@ -85,27 +85,39 @@ class EmailService {
     try {
       const template = emailTemplates.subscriptionConfirmation(subscriber);
 
+      // Genera la tessera PDF e allegala (best-effort: se fallisce, manda comunque l'email)
+      const attachments = [];
+      try {
+        if (subscriber.card_number) {
+          const { generateTessera } = require('./pdfService');
+          const pdfPath = await generateTessera({
+            cardNumber: subscriber.card_number,
+            name: subscriber.name,
+            year: subscriber.subscription_year,
+          });
+          attachments.push({ filename: `Tessera_Ekidna_${subscriber.card_number}.pdf`, path: pdfPath });
+          console.log('🪪 Tessera PDF generata:', pdfPath);
+        }
+      } catch (pdfErr) {
+        console.warn('⚠️  Tessera PDF non generata (email inviata senza allegato):', pdfErr.message);
+      }
+
       console.log('📤 Sending email via SMTP...');
       const info = await this.transporter.sendMail({
         from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
         to: subscriber.email,
         subject: template.subject,
         text: template.text,
-        html: template.html
+        html: template.html,
+        attachments,
       });
 
       console.log('✅ Confirmation email sent successfully!');
       console.log('📬 Message ID:', info.messageId);
       console.log('👤 Sent to:', subscriber.email);
 
-      // Update database to mark email as sent
-      await pool.query(
-        `UPDATE subscribers
-         SET email_confirmed = true,
-             email_confirmation_sent_at = CURRENT_TIMESTAMP
-         WHERE id = $1`,
-        [subscriber.id]
-      );
+      // Segna l'email come inviata (MySQL: colonna email_sent)
+      await pool.query('UPDATE subscribers SET email_sent = 1 WHERE id = ?', [subscriber.id]);
 
       console.log('✅ Database updated - email confirmed');
 
@@ -132,18 +144,18 @@ class EmailService {
     }
 
     try {
-      // Get admin/staff emails
-      const result = await pool.query(
-        'SELECT email FROM staff_users WHERE is_active = true AND role IN ($1, $2)',
+      // Get admin/staff emails (MySQL: ? placeholders, [rows] destructuring)
+      const [rows] = await pool.query(
+        'SELECT email FROM staff_users WHERE is_active = 1 AND role IN (?, ?)',
         ['admin', 'staff']
       );
 
-      if (result.rows.length === 0) {
+      if (!rows || rows.length === 0) {
         console.warn('No staff emails found for notification');
         return { success: false, message: 'No staff emails configured' };
       }
 
-      const staffEmails = result.rows.map(row => row.email);
+      const staffEmails = rows.map(row => row.email);
       const template = emailTemplates.staffNotification(subscriber);
 
       const info = await this.transporter.sendMail({

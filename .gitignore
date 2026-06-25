@@ -23,8 +23,8 @@ backend/public/uploads/
 # Temp files
 backend/tmp/
 
-# Tessera assets (copy manually to server)
-backend/assets/
+# Tessera assets: ora committati (servono al backend per generare il PDF tessera).
+# Font BethEllen (OFL) + template PDF dell'associazione.
 
 # Build output
 # I frontend sono compilati in backend/public/{site,admin} e COMMITTATI:

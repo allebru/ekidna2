@@ -1,7 +1,8 @@
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Navigation } from './components/Navigation';
 import { PageBackground } from './components/PageBackground';
 import { ScrollToTop } from './components/ScrollToTop';
+import { SeoMeta } from './components/SeoMeta';
 import { Footer } from './components/Footer';
 import { Home } from './components/Home';
 import { ChiSiamo } from './components/ChiSiamo';
@@ -19,6 +20,7 @@ export default function App() {
     <SiteContentProvider>
     <Router>
       <ScrollToTop />
+      <SeoMeta />
       <div className="relative min-h-screen text-white">
         <PageBackground />
         <Navigation />

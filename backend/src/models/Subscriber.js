@@ -22,18 +22,31 @@ class Subscriber {
     return { first_name: first, last_name: last };
   }
 
+  // Prossimo numero tessera globale, formato "O00001"
+  static async nextCardNumber() {
+    const [rows] = await pool.query(
+      "SELECT card_number FROM subscribers WHERE card_number REGEXP '^O[0-9]+$' ORDER BY CAST(SUBSTRING(card_number, 2) AS UNSIGNED) DESC LIMIT 1"
+    );
+    let n = 0;
+    if (rows[0] && rows[0].card_number) {
+      n = parseInt(String(rows[0].card_number).slice(1), 10) || 0;
+    }
+    return 'O' + String(n + 1).padStart(5, '0');
+  }
+
   static async create(data) {
     const { email, phone, birth_date, address, city, province, postal_code, subscription_year, notes } = data;
     const { first_name, last_name } = Subscriber.splitName(data);
+    const card_number = data.card_number || (await Subscriber.nextCardNumber());
     const [result] = await pool.execute(
       `INSERT INTO subscribers
-        (first_name, last_name, email, phone, birth_date, address, city, province, postal_code, subscription_year, notes, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (first_name, last_name, email, phone, birth_date, address, city, province, postal_code, card_number, subscription_year, notes, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         first_name, last_name,
         email || null, phone || null, birth_date || null,
         address || null, city || null, province || null, postal_code || null,
-        subscription_year, notes || null, 'active',
+        card_number, subscription_year, notes || null, 'active',
       ]
     );
     return Subscriber.findById(result.insertId);

@@ -52,10 +52,10 @@ export function Footer() {
                 +39 371 630 7881
               </a>
               <div className="flex space-x-6 pt-2">
-                <a href="#" className="text-gray-500 hover:text-[#e6332a] transition-colors text-sm uppercase tracking-wider">
+                <a href="https://www.facebook.com/associazioneekidna" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#e6332a] transition-colors text-sm uppercase tracking-wider">
                   FB
                 </a>
-                <a href="#" className="text-gray-500 hover:text-[#e6332a] transition-colors text-sm uppercase tracking-wider">
+                <a href="https://www.instagram.com/associazione_ekidna/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#e6332a] transition-colors text-sm uppercase tracking-wider">
                   IG
                 </a>
               </div>

@@ -33,8 +33,8 @@ const DEFAULT_CONTENT = [
   { page: 'contatti', key: 'intro_testo',   type: 'textarea', label: 'Testo introduttivo',        value: 'Ekidna è uno spazio aperto ad ogni proposta, se hai una band e ti piacerebbe suonare da noi, se sei un\'agenzia e vuoi proporci il tuo roster, se hai un\'idea che vorresti realizzare in Ekidna, scrivici! Cerchiamo di rispondere a tutt3 e di dare spazio a tutt3.', order: 1 },
   { page: 'contatti', key: 'email',         type: 'email',    label: 'Email',                     value: 'ekidnacarpi@gmail.com', order: 2 },
   { page: 'contatti', key: 'telefono',      type: 'phone',    label: 'Telefono / WhatsApp',       value: '+39 371 630 7881', order: 3 },
-  { page: 'contatti', key: 'facebook_url',  type: 'url',      label: 'URL Facebook',              value: 'https://www.facebook.com/ekidnaaps', order: 4 },
-  { page: 'contatti', key: 'instagram_url', type: 'url',      label: 'URL Instagram',             value: 'https://www.instagram.com/ekidnaaps', order: 5 },
+  { page: 'contatti', key: 'facebook_url',  type: 'url',      label: 'URL Facebook',              value: 'https://www.facebook.com/associazioneekidna', order: 4 },
+  { page: 'contatti', key: 'instagram_url', type: 'url',      label: 'URL Instagram',             value: 'https://www.instagram.com/associazione_ekidna/', order: 5 },
 ];
 
 async function run() {

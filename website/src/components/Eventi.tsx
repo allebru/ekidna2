@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
 
 type EventItem = {
@@ -152,11 +153,11 @@ export function Eventi() {
           <p className="text-gray-400 mb-8 leading-relaxed">
             Hai una band o un'idea per un evento? Contattaci!
           </p>
-          <a href="#/contatti">
+          <Link to="/contatti">
             <Button className="bg-[#e6332a] hover:bg-[#c41e17] text-black border border-[#e6332a] px-10 py-6 uppercase tracking-[0.15em] shadow-lg">
               Scrivici
             </Button>
-          </a>
+          </Link>
         </div>
       </div>
     </div>
