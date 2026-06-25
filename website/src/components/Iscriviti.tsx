@@ -58,6 +58,7 @@ export function Iscriviti() {
   const [errors, setErrors] = useState<Errors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const validate = (): Errors => {
     const e: Errors = {};
@@ -124,6 +125,7 @@ export function Iscriviti() {
     }
 
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const gg = String(formData.giorno).padStart(2, '0');
       const mm = String(formData.mese).padStart(2, '0');
@@ -159,10 +161,18 @@ export function Iscriviti() {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
       } else {
         setSubmitStatus('error');
+        if (response.errorCode === 'DUPLICATE_EMAIL') {
+          setSubmitError('Risulti già iscrittə con questa email. Se hai bisogno di assistenza contattaci via email.');
+        } else if (response.errorCode === 'NETWORK_ERROR') {
+          setSubmitError('Problema di connessione. Controlla la rete e riprova.');
+        } else {
+          setSubmitError('Errore nell\'invio. Riprova più tardi o contattaci via email.');
+        }
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
       }
-    } catch (error) {
-      console.error('Error submitting form:', error);
+    } catch {
       setSubmitStatus('error');
+      setSubmitError('Errore inatteso. Riprova più tardi o contattaci via email.');
     } finally {
       setIsSubmitting(false);
     }
@@ -400,9 +410,9 @@ export function Iscriviti() {
                   Grazie! La tua richiesta è stata inviata. Ti contatteremo presto.
                 </div>
               )}
-              {submitStatus === 'error' && (
+              {submitStatus === 'error' && submitError && (
                 <div className="bg-black border border-red-600 p-4 text-red-500 text-sm uppercase tracking-wider">
-                  Errore nell'invio. Riprova più tardi o contattaci via email.
+                  {submitError}
                 </div>
               )}
               {Object.keys(errors).length > 0 && (
