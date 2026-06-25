@@ -5,38 +5,17 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from './ui/dial
 export function Galleria() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // Mock gallery images
+  // Foto reali: sede Ekidna (sempre presente) + scatti dai nostri eventi
   const galleryImages = [
-    {
-      id: 1,
-      url: 'https://images.unsplash.com/photo-1648260029310-5f1da359af9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb25jZXJ0JTIwY3Jvd2QlMjBmZXN0aXZhbHxlbnwxfHx8fDE3NjA2MTk0MzV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-      alt: 'Concert crowd at festival',
-    },
-    {
-      id: 2,
-      url: 'https://images.unsplash.com/photo-1702733470477-26962cbd3f4e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZXRhbCUyMG11c2ljJTIwY29uY2VydHxlbnwxfHx8fDE3NjA2OTA3Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-      alt: 'Metal music concert',
-    },
-    {
-      id: 3,
-      url: 'https://images.unsplash.com/photo-1759137538239-60e0b1e796fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1bmRlcmdyb3VuZCUyMGNvbmNlcnQlMjBwdW5rfGVufDF8fHx8MTc2MDY5MDcyOHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-      alt: 'Underground punk concert',
-    },
-    {
-      id: 4,
-      url: 'https://images.unsplash.com/photo-1661697522391-699652d67ad3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZWtubyUyMHJhdmUlMjBwYXJ0eXxlbnwxfHx8fDE3NjA2OTA3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-      alt: 'Tekno rave party',
-    },
-    {
-      id: 5,
-      url: 'https://images.unsplash.com/photo-1729701164067-61eeeb5fe892?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaXklMjBwdW5rJTIwYXJ0d29ya3xlbnwxfHx8fDE3NjA2OTA3MzB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-      alt: 'DIY punk artwork',
-    },
-    {
-      id: 6,
-      url: 'https://images.unsplash.com/photo-1709138376162-793a9928a2fe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvbGQlMjBzY2hvb2wlMjBidWlsZGluZyUyMGNvdW50cnlzaWRlfGVufDF8fHx8MTc2MDY5MDcyOXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-      alt: 'Ekidna venue',
-    },
+    { id: 1, url: '/img/ekidna-luogo.jpg', alt: 'La sede di Associazione Ekidna a San Martino sulla Secchia (Carpi)' },
+    { id: 2, url: '/img/gallery/g1.jpg', alt: 'Associazione Ekidna — evento' },
+    { id: 3, url: '/img/gallery/g2.jpg', alt: 'Associazione Ekidna — concerto' },
+    { id: 4, url: '/img/gallery/g3.jpg', alt: 'Associazione Ekidna — serata underground' },
+    { id: 5, url: '/img/gallery/g4.jpg', alt: 'Associazione Ekidna — live' },
+    { id: 6, url: '/img/gallery/g5.jpg', alt: 'Associazione Ekidna — pubblico' },
+    { id: 7, url: '/img/gallery/g6.jpg', alt: 'Associazione Ekidna — festival' },
+    { id: 8, url: '/img/gallery/g7.jpg', alt: 'Associazione Ekidna — spazio e attività' },
+    { id: 9, url: '/img/gallery/g8.jpg', alt: 'Associazione Ekidna — momenti dal circolo' },
   ];
 
   return (
@@ -97,7 +76,7 @@ export function Galleria() {
 
         {/* Note */}
         <div className="mt-16 text-center text-gray-600 text-sm uppercase tracking-wider">
-          <p>Le foto verranno aggiunte dopo gli eventi</p>
+          <p>Altre foto verranno aggiunte dopo i prossimi eventi</p>
         </div>
       </div>
     </div>
