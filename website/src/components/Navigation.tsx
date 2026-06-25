@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import { Sheet, SheetClose, SheetContent, SheetTrigger } from './ui/sheet';
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,8 +53,13 @@ export function Navigation() {
             <SheetTrigger className="md:hidden text-[#e6332a] uppercase tracking-[0.15em] border border-[#e6332a] px-4 py-2 hover:bg-[#e6332a] hover:text-black transition-colors text-sm">
               Menu
             </SheetTrigger>
-            <SheetContent side="right" className="bg-black border-l-2 border-[#e6332a] w-[80vw] sm:w-[400px]">
+            <SheetContent side="right" className="bg-black border-l-2 border-[#e6332a] w-[80vw] sm:w-[400px]" hideDefaultClose>
               <div className="flex flex-col space-y-0 mt-8">
+                <SheetClose asChild>
+                  <button className="px-6 py-4 border-b border-[#e6332a]/40 text-[#e6332a] uppercase tracking-[0.15em] text-sm text-left hover:bg-[#e6332a]/10 transition-colors">
+                    ← Chiudi
+                  </button>
+                </SheetClose>
                 {navLinks.map((link) => (
                   <Link
                     key={link.path}

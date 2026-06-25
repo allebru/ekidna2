@@ -7,7 +7,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 const DEFAULTS = {
   home: {
     hero_sottotitolo: 'Spazio autogestito, culturale e indipendente dal 1998',
-    cta_titolo: 'Diventa socio/a/ə di Ekidna',
+    cta_titolo: 'Diventa sociə di Ekidna',
     cta_testo: "L'Associazione Ekidna è uno spazio autogestito, culturale e indipendente. Per partecipare alle nostre attività, ai concerti, ai nostri eventi e frequentare i nostri spazi è necessario tesserarsi. La tessera associativa è completamente gratuita, ha validità per l'anno in corso e l'adesione comporta l'accettazione dello Statuto dell'Associazione.",
   },
   chi_siamo: {
@@ -37,8 +37,8 @@ const DEFAULTS = {
     intro_testo: 'Ekidna è uno spazio aperto ad ogni proposta. Scrivici per collaborare o proporre un evento!',
     email: 'ekidnacarpi@gmail.com',
     telefono: '+39 371 630 7881',
-    facebook_url: 'https://www.facebook.com/ekidnaaps',
-    instagram_url: 'https://www.instagram.com/ekidnaaps',
+    facebook_url: 'https://www.facebook.com/associazioneekidna',
+    instagram_url: 'https://www.instagram.com/associazione_ekidna/',
   },
 };
 

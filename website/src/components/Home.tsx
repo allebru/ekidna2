@@ -74,7 +74,7 @@ export function Home() {
             </p>
             <Link to="/iscriviti" className="block sm:inline-block">
               <Button className="w-full sm:w-auto bg-[#e6332a] hover:bg-[#c41e17] text-black border border-[#e6332a] px-6 sm:px-12 py-5 sm:py-7 uppercase tracking-[0.1em] sm:tracking-[0.15em] shadow-lg text-base sm:text-lg whitespace-normal h-auto leading-snug">
-                Diventa socio/a/ə di Ekidna
+                Diventa sociə di Ekidna
               </Button>
             </Link>
           </div>

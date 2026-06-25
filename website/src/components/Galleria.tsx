@@ -16,6 +16,7 @@ export function Galleria() {
     { id: 7, url: '/img/gallery/g6.jpg', alt: 'Associazione Ekidna — festival' },
     { id: 8, url: '/img/gallery/g7.jpg', alt: 'Associazione Ekidna — spazio e attività' },
     { id: 9, url: '/img/gallery/g8.jpg', alt: 'Associazione Ekidna — momenti dal circolo' },
+    { id: 10, url: '/img/gallery/g9.jpg', alt: 'Associazione Ekidna — il palco' },
   ];
 
   return (
@@ -27,9 +28,6 @@ export function Galleria() {
             Galleria
           </h1>
           <div className="h-px w-32 bg-[#e6332a] mx-auto mb-6"></div>
-          <p className="text-gray-400 max-w-2xl mx-auto">
-            Foto dei nostri eventi e concerti
-          </p>
         </div>
 
         {/* Gallery Grid */}
@@ -74,10 +72,6 @@ export function Galleria() {
           </DialogContent>
         </Dialog>
 
-        {/* Note */}
-        <div className="mt-16 text-center text-gray-600 text-sm uppercase tracking-wider">
-          <p>Altre foto verranno aggiunte dopo i prossimi eventi</p>
-        </div>
       </div>
     </div>
   );
