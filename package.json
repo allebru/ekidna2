@@ -8,8 +8,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "postinstall": "npm install --prefix backend --omit=dev",
-    "build": "npm install --prefix backend --omit=dev",
+    "postinstall": "cd backend && npm install --omit=dev",
+    "build": "cd backend && npm install --omit=dev",
     "start": "node server.js"
   }
 }
