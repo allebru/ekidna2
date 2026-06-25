@@ -80,7 +80,7 @@ export function Iscriviti() {
     <div className="min-h-screen pt-24 md:pt-32 pb-12">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-10 md:mb-16 border-2 border-[#d4a017] p-6 sm:p-8 md:p-12 bg-black/60 backdrop-blur-sm shadow-2xl">
+        <div className="text-center mb-10 md:mb-16 border-2 border-[#e6332a] p-6 sm:p-8 md:p-12 bg-black/60 backdrop-blur-sm shadow-2xl">
           <img
             src="/logo/ekidna-icon.svg"
             alt=""
@@ -88,10 +88,10 @@ export function Iscriviti() {
             style={{ height: 'clamp(3.5rem, 8vw, 5rem)' }}
             className="mx-auto mb-8"
           />
-          <h1 className="text-3xl sm:text-4xl md:text-6xl uppercase tracking-[0.15em] text-[#d4a017] mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl uppercase tracking-[0.15em] text-[#e6332a] mb-6">
             Diventa socio/a/ə di Ekidna
           </h1>
-          <div className="h-px w-32 bg-[#d4a017] mx-auto mb-6"></div>
+          <div className="h-px w-32 bg-[#e6332a] mx-auto mb-6"></div>
           <p className="text-gray-400 max-w-2xl mx-auto">
             La tessera associativa è completamente gratuita
           </p>
@@ -99,16 +99,16 @@ export function Iscriviti() {
 
         <div className="max-w-3xl mx-auto">
           {/* Intro */}
-          <div className="border border-[#d4a017]/30 p-8 md:p-12 mb-12 bg-zinc-950/50 shadow-xl">
-            <h2 className="text-2xl text-[#d4a017] mb-6 uppercase tracking-[0.15em]">
+          <div className="border border-[#e6332a]/30 p-8 md:p-12 mb-12 bg-zinc-950/50 shadow-xl">
+            <h2 className="text-2xl text-[#e6332a] mb-6 uppercase tracking-[0.15em]">
               Diventa socio/a/ə di Associazione Ekidna
             </h2>
-            <div className="h-px w-24 bg-[#d4a017] mb-8"></div>
+            <div className="h-px w-24 bg-[#e6332a] mb-8"></div>
             <p className="text-gray-400 leading-relaxed mb-6">
               L'Associazione Ekidna è uno spazio autogestito, culturale e indipendente. Per partecipare alle nostre attività, ai concerti, ai nostri eventi e frequentare i nostri spazi è necessario tesserarsi.
             </p>
             <p className="text-gray-400 leading-relaxed mb-6">
-              La tessera associativa è <span className="text-[#d4a017]">completamente gratuita</span>, ha validità per l'anno in corso e l'adesione comporta l'accettazione dello Statuto dell'Associazione.
+              La tessera associativa è <span className="text-[#e6332a]">completamente gratuita</span>, ha validità per l'anno in corso e l'adesione comporta l'accettazione dello Statuto dell'Associazione.
             </p>
             <p className="text-gray-500 text-sm">
               Compila il modulo qui sotto per richiedere la tua tessera associativa gratuita.
@@ -116,7 +116,7 @@ export function Iscriviti() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="border border-[#d4a017]/30 p-8 md:p-12 bg-zinc-950/50 shadow-xl">
+          <form onSubmit={handleSubmit} className="border border-[#e6332a]/30 p-8 md:p-12 bg-zinc-950/50 shadow-xl">
             <div className="space-y-6">
               {/* Personal Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -131,7 +131,7 @@ export function Iscriviti() {
                     required
                     value={formData.nome}
                     onChange={handleChange}
-                    className="bg-black border border-[#d4a017]/30 text-gray-300 focus:border-[#d4a017]"
+                    className="bg-black border border-[#e6332a]/30 text-gray-300 focus:border-[#e6332a]"
                   />
                 </div>
                 <div>
@@ -145,7 +145,7 @@ export function Iscriviti() {
                     required
                     value={formData.cognome}
                     onChange={handleChange}
-                    className="bg-black border border-[#d4a017]/30 text-gray-300 focus:border-[#d4a017]"
+                    className="bg-black border border-[#e6332a]/30 text-gray-300 focus:border-[#e6332a]"
                   />
                 </div>
               </div>
@@ -162,7 +162,7 @@ export function Iscriviti() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="bg-black border border-[#d4a017]/30 text-gray-300 focus:border-[#d4a017]"
+                    className="bg-black border border-[#e6332a]/30 text-gray-300 focus:border-[#e6332a]"
                   />
                 </div>
                 <div>
@@ -176,7 +176,7 @@ export function Iscriviti() {
                     required
                     value={formData.telefono}
                     onChange={handleChange}
-                    className="bg-black border border-[#d4a017]/30 text-gray-300 focus:border-[#d4a017]"
+                    className="bg-black border border-[#e6332a]/30 text-gray-300 focus:border-[#e6332a]"
                   />
                 </div>
               </div>
@@ -192,7 +192,7 @@ export function Iscriviti() {
                   required
                   value={formData.dataNascita}
                   onChange={handleChange}
-                  className="bg-black border border-[#d4a017]/30 text-gray-300 focus:border-[#d4a017]"
+                  className="bg-black border border-[#e6332a]/30 text-gray-300 focus:border-[#e6332a]"
                 />
               </div>
 
@@ -207,7 +207,7 @@ export function Iscriviti() {
                   required
                   value={formData.indirizzo}
                   onChange={handleChange}
-                  className="bg-black border border-[#d4a017]/30 text-gray-300 focus:border-[#d4a017]"
+                  className="bg-black border border-[#e6332a]/30 text-gray-300 focus:border-[#e6332a]"
                 />
               </div>
 
@@ -223,7 +223,7 @@ export function Iscriviti() {
                     required
                     value={formData.citta}
                     onChange={handleChange}
-                    className="bg-black border border-[#d4a017]/30 text-gray-300 focus:border-[#d4a017]"
+                    className="bg-black border border-[#e6332a]/30 text-gray-300 focus:border-[#e6332a]"
                   />
                 </div>
                 <div>
@@ -237,7 +237,7 @@ export function Iscriviti() {
                     required
                     value={formData.cap}
                     onChange={handleChange}
-                    className="bg-black border border-[#d4a017]/30 text-gray-300 focus:border-[#d4a017]"
+                    className="bg-black border border-[#e6332a]/30 text-gray-300 focus:border-[#e6332a]"
                   />
                 </div>
                 <div>
@@ -252,7 +252,7 @@ export function Iscriviti() {
                     maxLength={2}
                     value={formData.provincia}
                     onChange={handleChange}
-                    className="bg-black border border-[#d4a017]/30 text-gray-300 focus:border-[#d4a017]"
+                    className="bg-black border border-[#e6332a]/30 text-gray-300 focus:border-[#e6332a]"
                     placeholder="MO"
                   />
                 </div>
@@ -268,7 +268,7 @@ export function Iscriviti() {
                   rows={5}
                   value={formData.motivazione}
                   onChange={handleChange}
-                  className="bg-black border border-[#d4a017]/30 text-gray-300 focus:border-[#d4a017] resize-none"
+                  className="bg-black border border-[#e6332a]/30 text-gray-300 focus:border-[#e6332a] resize-none"
                   placeholder="Raccontaci..."
                 />
               </div>
@@ -280,7 +280,7 @@ export function Iscriviti() {
                   onCheckedChange={(checked) =>
                     setFormData((prev) => ({ ...prev, accettaTermini: checked as boolean }))
                   }
-                  className="border border-[#d4a017]/30 data-[state=checked]:bg-[#d4a017] data-[state=checked]:border-[#d4a017]"
+                  className="border border-[#e6332a]/30 data-[state=checked]:bg-[#e6332a] data-[state=checked]:border-[#e6332a]"
                 />
                 <Label htmlFor="accettaTermini" className="text-gray-400 text-sm leading-relaxed cursor-pointer">
                   Dichiaro di condividere i valori di Ekidna APS (antifascismo, transfemminismo, ecologia, DIY) e accetto lo statuto dell'associazione *
@@ -294,11 +294,11 @@ export function Iscriviti() {
                   onCheckedChange={(checked) =>
                     setFormData((prev) => ({ ...prev, accettaPrivacy: checked as boolean }))
                   }
-                  className="border border-[#d4a017]/30 data-[state=checked]:bg-[#d4a017] data-[state=checked]:border-[#d4a017]"
+                  className="border border-[#e6332a]/30 data-[state=checked]:bg-[#e6332a] data-[state=checked]:border-[#e6332a]"
                 />
                 <Label htmlFor="accettaPrivacy" className="text-gray-400 text-sm leading-relaxed cursor-pointer">
                   Ho letto e accetto la{' '}
-                  <a href="#/privacy" target="_blank" className="text-[#d4a017] hover:underline">
+                  <a href="#/privacy" target="_blank" className="text-[#e6332a] hover:underline">
                     Privacy Policy
                   </a>{' '}
                   e acconsento al trattamento dei miei dati personali per la gestione dell'iscrizione *
@@ -321,7 +321,7 @@ export function Iscriviti() {
               <Button
                 type="submit"
                 disabled={!formData.accettaTermini || !formData.accettaPrivacy || isSubmitting}
-                className="w-full bg-[#d4a017] hover:bg-[#b8860b] text-black py-6 uppercase tracking-[0.15em] disabled:opacity-50 disabled:cursor-not-allowed border border-[#d4a017] shadow-lg"
+                className="w-full bg-[#e6332a] hover:bg-[#c41e17] text-black py-6 uppercase tracking-[0.15em] disabled:opacity-50 disabled:cursor-not-allowed border border-[#e6332a] shadow-lg"
               >
                 {isSubmitting ? 'Invio...' : 'Invia'}
               </Button>

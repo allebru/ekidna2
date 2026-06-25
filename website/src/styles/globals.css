@@ -211,9 +211,9 @@ body::before {
 
 /* Custom yellow color - dark gold */
 :root {
-  --ekidna-yellow: #d4a017;
-  --ekidna-yellow-dark: #b8860b;
-  --ekidna-yellow-light: #daa520;
+  --ekidna-yellow: #e6332a;
+  --ekidna-yellow-dark: #c41e17;
+  --ekidna-yellow-light: #ec5249;
 }
 
 /* ==========================================================================

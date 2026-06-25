@@ -4,30 +4,30 @@ export function PrivacyPolicy() {
   return (
     <div className="min-h-screen pt-24 md:pt-32 pb-16">
       <div className="container mx-auto px-4 max-w-3xl">
-        <div className="text-center mb-12 border-2 border-[#d4a017] p-8 bg-black/60 backdrop-blur-sm">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#d4a017] mb-4">
+        <div className="text-center mb-12 border-2 border-[#e6332a] p-8 bg-black/60 backdrop-blur-sm">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#e6332a] mb-4">
             Privacy Policy
           </h1>
-          <div className="h-px w-24 bg-[#d4a017] mx-auto mb-4"></div>
+          <div className="h-px w-24 bg-[#e6332a] mx-auto mb-4"></div>
           <p className="text-gray-500 text-sm">Ultimo aggiornamento: giugno 2026</p>
         </div>
 
         <div className="space-y-8 text-gray-400 leading-relaxed">
 
-          <section className="border border-[#d4a017]/20 p-6 bg-zinc-950/50">
-            <h2 className="text-[#d4a017] uppercase tracking-[0.15em] mb-4 text-lg">1. Titolare del Trattamento</h2>
-            <div className="h-px w-12 bg-[#d4a017] mb-4"></div>
+          <section className="border border-[#e6332a]/20 p-6 bg-zinc-950/50">
+            <h2 className="text-[#e6332a] uppercase tracking-[0.15em] mb-4 text-lg">1. Titolare del Trattamento</h2>
+            <div className="h-px w-12 bg-[#e6332a] mb-4"></div>
             <p>
               <strong className="text-gray-300">Ekidna APS</strong><br />
               Via Livorno 9, 41012 Carpi (MO)<br />
-              Email: <a href="mailto:ekidnacarpi@gmail.com" className="text-[#d4a017] hover:underline">ekidnacarpi@gmail.com</a><br />
+              Email: <a href="mailto:ekidnacarpi@gmail.com" className="text-[#e6332a] hover:underline">ekidnacarpi@gmail.com</a><br />
               Tel: +39 371 630 7881
             </p>
           </section>
 
-          <section className="border border-[#d4a017]/20 p-6 bg-zinc-950/50">
-            <h2 className="text-[#d4a017] uppercase tracking-[0.15em] mb-4 text-lg">2. Dati Raccolti</h2>
-            <div className="h-px w-12 bg-[#d4a017] mb-4"></div>
+          <section className="border border-[#e6332a]/20 p-6 bg-zinc-950/50">
+            <h2 className="text-[#e6332a] uppercase tracking-[0.15em] mb-4 text-lg">2. Dati Raccolti</h2>
+            <div className="h-px w-12 bg-[#e6332a] mb-4"></div>
             <p className="mb-3">Raccogliamo i seguenti dati personali esclusivamente attraverso il modulo di iscrizione:</p>
             <ul className="list-disc list-inside space-y-1 text-gray-500">
               <li>Nome e cognome</li>
@@ -42,9 +42,9 @@ export function PrivacyPolicy() {
             </p>
           </section>
 
-          <section className="border border-[#d4a017]/20 p-6 bg-zinc-950/50">
-            <h2 className="text-[#d4a017] uppercase tracking-[0.15em] mb-4 text-lg">3. Finalità e Base Giuridica</h2>
-            <div className="h-px w-12 bg-[#d4a017] mb-4"></div>
+          <section className="border border-[#e6332a]/20 p-6 bg-zinc-950/50">
+            <h2 className="text-[#e6332a] uppercase tracking-[0.15em] mb-4 text-lg">3. Finalità e Base Giuridica</h2>
+            <div className="h-px w-12 bg-[#e6332a] mb-4"></div>
             <div className="space-y-3">
               <div>
                 <p className="text-gray-300 mb-1">Gestione associativa</p>
@@ -61,15 +61,15 @@ export function PrivacyPolicy() {
             </div>
           </section>
 
-          <section className="border border-[#d4a017]/20 p-6 bg-zinc-950/50">
-            <h2 className="text-[#d4a017] uppercase tracking-[0.15em] mb-4 text-lg">4. Conservazione dei Dati</h2>
-            <div className="h-px w-12 bg-[#d4a017] mb-4"></div>
+          <section className="border border-[#e6332a]/20 p-6 bg-zinc-950/50">
+            <h2 className="text-[#e6332a] uppercase tracking-[0.15em] mb-4 text-lg">4. Conservazione dei Dati</h2>
+            <div className="h-px w-12 bg-[#e6332a] mb-4"></div>
             <p>I dati sono conservati per tutta la durata dell'iscrizione all'associazione. Dopo la cessazione del rapporto associativo, i dati necessari per adempimenti fiscali e contabili sono conservati per 10 anni ai sensi della normativa vigente. Gli altri dati sono cancellati entro 12 mesi dalla cessazione.</p>
           </section>
 
-          <section className="border border-[#d4a017]/20 p-6 bg-zinc-950/50">
-            <h2 className="text-[#d4a017] uppercase tracking-[0.15em] mb-4 text-lg">5. Destinatari</h2>
-            <div className="h-px w-12 bg-[#d4a017] mb-4"></div>
+          <section className="border border-[#e6332a]/20 p-6 bg-zinc-950/50">
+            <h2 className="text-[#e6332a] uppercase tracking-[0.15em] mb-4 text-lg">5. Destinatari</h2>
+            <div className="h-px w-12 bg-[#e6332a] mb-4"></div>
             <p>I dati non vengono ceduti a terzi per finalità commerciali. Possono essere comunicati esclusivamente a:</p>
             <ul className="list-disc list-inside space-y-1 text-gray-500 mt-2">
               <li>Professionisti incaricati della gestione contabile e fiscale dell'associazione</li>
@@ -78,9 +78,9 @@ export function PrivacyPolicy() {
             <p className="mt-3 text-sm">Non vengono effettuati trasferimenti di dati verso paesi extra-UE.</p>
           </section>
 
-          <section className="border border-[#d4a017]/20 p-6 bg-zinc-950/50">
-            <h2 className="text-[#d4a017] uppercase tracking-[0.15em] mb-4 text-lg">6. I Tuoi Diritti</h2>
-            <div className="h-px w-12 bg-[#d4a017] mb-4"></div>
+          <section className="border border-[#e6332a]/20 p-6 bg-zinc-950/50">
+            <h2 className="text-[#e6332a] uppercase tracking-[0.15em] mb-4 text-lg">6. I Tuoi Diritti</h2>
+            <div className="h-px w-12 bg-[#e6332a] mb-4"></div>
             <p className="mb-3">Ai sensi degli artt. 15-22 del GDPR hai diritto di:</p>
             <ul className="list-disc list-inside space-y-1 text-gray-500">
               <li><strong className="text-gray-400">Accesso</strong> — ottenere conferma che siano trattati dati che ti riguardano e riceverne copia</li>
@@ -92,18 +92,18 @@ export function PrivacyPolicy() {
               <li><strong className="text-gray-400">Revoca del consenso</strong> — in qualsiasi momento, senza pregiudizio per il trattamento precedente</li>
             </ul>
             <p className="mt-4">
-              Per esercitare i tuoi diritti scrivi a: <a href="mailto:ekidnacarpi@gmail.com" className="text-[#d4a017] hover:underline">ekidnacarpi@gmail.com</a>
+              Per esercitare i tuoi diritti scrivi a: <a href="mailto:ekidnacarpi@gmail.com" className="text-[#e6332a] hover:underline">ekidnacarpi@gmail.com</a>
             </p>
             <p className="mt-2 text-sm text-gray-500">
-              Hai inoltre il diritto di proporre reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener noreferrer" className="text-[#d4a017] hover:underline">www.garanteprivacy.it</a>).
+              Hai inoltre il diritto di proporre reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener noreferrer" className="text-[#e6332a] hover:underline">www.garanteprivacy.it</a>).
             </p>
           </section>
 
-          <section className="border border-[#d4a017]/20 p-6 bg-zinc-950/50">
-            <h2 className="text-[#d4a017] uppercase tracking-[0.15em] mb-4 text-lg">7. Cookie Policy</h2>
-            <div className="h-px w-12 bg-[#d4a017] mb-4"></div>
+          <section className="border border-[#e6332a]/20 p-6 bg-zinc-950/50">
+            <h2 className="text-[#e6332a] uppercase tracking-[0.15em] mb-4 text-lg">7. Cookie Policy</h2>
+            <div className="h-px w-12 bg-[#e6332a] mb-4"></div>
             <p className="mb-3">Questo sito utilizza esclusivamente <strong className="text-gray-300">cookie tecnici</strong>, necessari al corretto funzionamento delle pagine. Non vengono installati cookie di profilazione o di tracciamento.</p>
-            <div className="mt-3 border border-[#d4a017]/10 p-4 bg-black/30">
+            <div className="mt-3 border border-[#e6332a]/10 p-4 bg-black/30">
               <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Cookie utilizzati</p>
               <table className="w-full text-sm">
                 <thead>
@@ -129,7 +129,7 @@ export function PrivacyPolicy() {
         </div>
 
         <div className="mt-10 text-center">
-          <Link to="/" className="text-[#d4a017] hover:underline uppercase tracking-wider text-sm">
+          <Link to="/" className="text-[#e6332a] hover:underline uppercase tracking-wider text-sm">
             ← Torna alla Home
           </Link>
         </div>

@@ -19,7 +19,7 @@ export function Navigation() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-md border-b-2 border-[#d4a017] shadow-lg">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-md border-b-2 border-[#e6332a] shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
@@ -39,8 +39,8 @@ export function Navigation() {
                 to={link.path}
                 className={`px-5 py-2 transition-all uppercase tracking-[0.1em] text-sm ${
                   isActive(link.path)
-                    ? 'text-black bg-[#d4a017]'
-                    : 'text-gray-400 hover:text-[#d4a017]'
+                    ? 'text-black bg-[#e6332a]'
+                    : 'text-gray-400 hover:text-[#e6332a]'
                 }`}
               >
                 {link.name}
@@ -50,20 +50,20 @@ export function Navigation() {
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger className="md:hidden text-[#d4a017] uppercase tracking-[0.15em] border border-[#d4a017] px-4 py-2 hover:bg-[#d4a017] hover:text-black transition-colors text-sm">
+            <SheetTrigger className="md:hidden text-[#e6332a] uppercase tracking-[0.15em] border border-[#e6332a] px-4 py-2 hover:bg-[#e6332a] hover:text-black transition-colors text-sm">
               Menu
             </SheetTrigger>
-            <SheetContent side="right" className="bg-black border-l-2 border-[#d4a017] w-[80vw] sm:w-[400px]">
+            <SheetContent side="right" className="bg-black border-l-2 border-[#e6332a] w-[80vw] sm:w-[400px]">
               <div className="flex flex-col space-y-0 mt-8">
                 {navLinks.map((link) => (
                   <Link
                     key={link.path}
                     to={link.path}
                     onClick={() => setIsOpen(false)}
-                    className={`px-6 py-4 transition-all border-b border-[#d4a017]/20 uppercase tracking-[0.1em] text-sm ${
+                    className={`px-6 py-4 transition-all border-b border-[#e6332a]/20 uppercase tracking-[0.1em] text-sm ${
                       isActive(link.path)
-                        ? 'text-black bg-[#d4a017]'
-                        : 'text-gray-400 hover:text-[#d4a017]'
+                        ? 'text-black bg-[#e6332a]'
+                        : 'text-gray-400 hover:text-[#e6332a]'
                     }`}
                   >
                     {link.name}

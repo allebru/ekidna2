@@ -18,25 +18,25 @@ export function Home() {
         </div>
 
         <div className="relative z-10 text-center px-4 max-w-5xl">
-          <div className="border-2 border-[#d4a017] p-8 md:p-16 bg-black/60 backdrop-blur-sm shadow-2xl">
+          <div className="border-2 border-[#e6332a] p-8 md:p-16 bg-black/60 backdrop-blur-sm shadow-2xl">
             <img
               src="/logo/ekidna-logo-v.svg"
               alt="Ekidna"
               style={{ height: 'clamp(7rem, 18vw, 12rem)' }}
               className="mx-auto mb-8"
             />
-            <div className="h-px bg-gradient-to-r from-transparent via-[#d4a017] to-transparent w-full mb-8"></div>
+            <div className="h-px bg-gradient-to-r from-transparent via-[#e6332a] to-transparent w-full mb-8"></div>
             <p className="text-xl md:text-2xl text-gray-300 mb-10 tracking-[0.15em] uppercase">
               {c.hero_sottotitolo}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/eventi">
-                <Button className="bg-[#d4a017] hover:bg-[#b8860b] text-black border border-[#d4a017] px-10 py-6 uppercase tracking-[0.15em] shadow-lg">
+                <Button className="bg-[#e6332a] hover:bg-[#c41e17] text-black border border-[#e6332a] px-10 py-6 uppercase tracking-[0.15em] shadow-lg">
                   Eventi
                 </Button>
               </Link>
               <Link to="/chi-siamo">
-                <Button variant="outline" className="border border-[#d4a017] text-[#d4a017] hover:bg-[#d4a017] hover:text-black px-10 py-6 uppercase tracking-[0.15em]">
+                <Button variant="outline" className="border border-[#e6332a] text-[#e6332a] hover:bg-[#e6332a] hover:text-black px-10 py-6 uppercase tracking-[0.15em]">
                   Scopri di più
                 </Button>
               </Link>
@@ -57,7 +57,7 @@ export function Home() {
           <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}></div>
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center border-2 border-[#d4a017] p-12 md:p-20 bg-black/60 backdrop-blur-sm shadow-2xl">
+          <div className="max-w-4xl mx-auto text-center border-2 border-[#e6332a] p-12 md:p-20 bg-black/60 backdrop-blur-sm shadow-2xl">
             <img
               src="/logo/ekidna-icon.svg"
               alt=""
@@ -65,15 +65,15 @@ export function Home() {
               style={{ height: 'clamp(3.5rem, 8vw, 5rem)' }}
               className="mx-auto mb-8"
             />
-            <h2 className="text-3xl md:text-5xl uppercase tracking-[0.15em] text-[#d4a017] mb-6">
+            <h2 className="text-3xl md:text-5xl uppercase tracking-[0.15em] text-[#e6332a] mb-6">
               {c.cta_titolo}
             </h2>
-            <div className="h-px w-32 bg-[#d4a017] mx-auto mb-8"></div>
+            <div className="h-px w-32 bg-[#e6332a] mx-auto mb-8"></div>
             <p className="text-gray-400 mb-12 leading-relaxed max-w-2xl mx-auto">
               {c.cta_testo}
             </p>
             <Link to="/iscriviti">
-              <Button className="bg-[#d4a017] hover:bg-[#b8860b] text-black border border-[#d4a017] px-12 py-7 uppercase tracking-[0.15em] shadow-lg text-lg">
+              <Button className="bg-[#e6332a] hover:bg-[#c41e17] text-black border border-[#e6332a] px-12 py-7 uppercase tracking-[0.15em] shadow-lg text-lg">
                 Diventa socio/a/ə di Ekidna
               </Button>
             </Link>
