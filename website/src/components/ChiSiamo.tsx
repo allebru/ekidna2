@@ -53,8 +53,8 @@ export function ChiSiamo() {
               
               <div className="border border-[#e6332a]/30 overflow-hidden shadow-xl">
                 <ImageWithFallback
-                  src="https://images.unsplash.com/photo-1709138376162-793a9928a2fe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvbGQlMjBzY2hvb2wlMjBidWlsZGluZyUyMGNvdW50cnlzaWRlfGVufDF8fHx8MTc2MDY5MDcyOXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                  alt="La nostra sede"
+                  src="/img/ekidna-luogo.jpg"
+                  alt="La sede di Associazione Ekidna a San Martino sulla Secchia (Carpi)"
                   className="w-full h-full object-cover min-h-[400px]"
                 />
               </div>
