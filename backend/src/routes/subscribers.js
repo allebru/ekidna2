@@ -4,7 +4,7 @@ const SubscriberController = require('../controllers/subscriberController');
 const { authenticateToken } = require('../middleware/auth');
 const {
   validateSubscriber,
-  validateUUID,
+  validateId,
   validateQueryParams
 } = require('../middleware/validation');
 
@@ -49,15 +49,15 @@ router.get('/stats', authenticateToken, SubscriberController.getStats);
 router.get('/year/:year', authenticateToken, SubscriberController.getByYear);
 
 // GET /api/subscribers/:id - get subscriber by ID
-router.get('/:id', authenticateToken, validateUUID, SubscriberController.getById);
+router.get('/:id', authenticateToken, validateId, SubscriberController.getById);
 
 // PUT /api/subscribers/:id - update subscriber
-router.put('/:id', authenticateToken, validateUUID, validateSubscriber, SubscriberController.update);
+router.put('/:id', authenticateToken, validateId, validateSubscriber, SubscriberController.update);
 
 // DELETE /api/subscribers/:id - soft delete subscriber
-router.delete('/:id', authenticateToken, validateUUID, SubscriberController.softDelete);
+router.delete('/:id', authenticateToken, validateId, SubscriberController.softDelete);
 
 // POST /api/subscribers/:id/restore - restore deleted subscriber
-router.post('/:id/restore', authenticateToken, validateUUID, SubscriberController.restore);
+router.post('/:id/restore', authenticateToken, validateId, SubscriberController.restore);
 
 module.exports = router;

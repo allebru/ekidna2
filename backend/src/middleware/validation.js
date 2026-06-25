@@ -67,11 +67,11 @@ const validateLogin = [
   handleValidationErrors
 ];
 
-// Validation rules for UUID parameters
-const validateUUID = [
+// Validation rules for ID parameters (gli ID sono interi auto-increment, NON UUID)
+const validateId = [
   param('id')
     .notEmpty().withMessage('ID is required')
-    .isUUID().withMessage('Invalid ID format'),
+    .isInt({ min: 1 }).withMessage('Invalid ID format'),
 
   handleValidationErrors
 ];
@@ -100,7 +100,7 @@ const validateQueryParams = [
 module.exports = {
   validateSubscriber,
   validateLogin,
-  validateUUID,
+  validateId,
   validateQueryParams,
   handleValidationErrors
 };
