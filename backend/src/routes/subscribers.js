@@ -1,5 +1,4 @@
 const express = require('express');
-const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const SubscriberController = require('../controllers/subscriberController');
 const { authenticateToken } = require('../middleware/auth');
@@ -9,14 +8,22 @@ const {
   validateQueryParams
 } = require('../middleware/validation');
 
-// Anti-abuso: limita gli invii pubblici del form (max 8/ora per IP)
-const createLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 8,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Troppe richieste di tesseramento da questo indirizzo. Riprova tra un\'ora.' },
-});
+// Anti-abuso: limita gli invii pubblici del form (max 8/ora per IP).
+// Difensivo: se 'express-rate-limit' non e' installato sul server, NON
+// far crashare l'app (degrada a no-op), cosi' il sito resta su.
+let createLimiter = (req, res, next) => next();
+try {
+  const rateLimit = require('express-rate-limit');
+  createLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 8,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Troppe richieste di tesseramento da questo indirizzo. Riprova tra un\'ora.' },
+  });
+} catch (err) {
+  console.warn('⚠ express-rate-limit non disponibile: rate-limit disattivato.', err.message);
+}
 
 // Honeypot anti-bot: il campo "website" e' nascosto nel form; se valorizzato e' un bot.
 // Rispondiamo con un finto successo per non segnalare il blocco.
