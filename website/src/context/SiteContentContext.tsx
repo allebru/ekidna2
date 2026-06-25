@@ -1,9 +1,5 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { checkAPIHealth } from '../config/api';
+import { createContext, useContext, ReactNode } from 'react';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
-
-// Default fallback content (shown if API is unreachable)
 const DEFAULTS = {
   home: {
     hero_sottotitolo: 'Spazio autogestito, culturale e indipendente dal 1998',
@@ -22,11 +18,7 @@ const DEFAULTS = {
     ]),
   },
   galleria: {
-    gallery_items: JSON.stringify([
-      { id: 1, url: 'https://images.unsplash.com/photo-1540039155733-5bb30b4201de?w=800', alt: 'Concert crowd' },
-      { id: 2, url: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800', alt: 'Metal concert' },
-      { id: 3, url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800', alt: 'Underground concert' },
-    ]),
+    gallery_items: JSON.stringify([]),
   },
   dove_siamo: {
     indirizzo: 'Ex scuola elementare di San Martino sulla Secchia, Carpi (MO)',
@@ -47,26 +39,8 @@ type SiteContent = typeof DEFAULTS;
 const SiteContentContext = createContext<SiteContent>(DEFAULTS);
 
 export function SiteContentProvider({ children }: { children: ReactNode }) {
-  const [content, setContent] = useState<SiteContent>(DEFAULTS);
-
-  useEffect(() => {
-    fetch(`${API_BASE}/content`)
-      .then(r => r.json())
-      .then(({ data }) => {
-        if (data) {
-          // Merge API data over defaults so missing keys still have fallbacks
-          const merged: any = { ...DEFAULTS };
-          for (const page of Object.keys(DEFAULTS)) {
-            merged[page] = { ...(DEFAULTS as any)[page], ...(data[page] || {}) };
-          }
-          setContent(merged);
-        }
-      })
-      .catch(() => { /* stay with defaults */ });
-  }, []);
-
   return (
-    <SiteContentContext.Provider value={content}>
+    <SiteContentContext.Provider value={DEFAULTS}>
       {children}
     </SiteContentContext.Provider>
   );
