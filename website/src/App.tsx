@@ -1,5 +1,6 @@
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Navigation } from './components/Navigation';
+import { PageBackground } from './components/PageBackground';
 import { Footer } from './components/Footer';
 import { Home } from './components/Home';
 import { ChiSiamo } from './components/ChiSiamo';
@@ -16,7 +17,8 @@ export default function App() {
   return (
     <SiteContentProvider>
     <Router>
-      <div className="min-h-screen bg-black text-white">
+      <div className="relative min-h-screen text-white">
+        <PageBackground />
         <Navigation />
         <main>
           <Routes>
