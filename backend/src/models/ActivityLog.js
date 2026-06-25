@@ -2,10 +2,11 @@ const pool = require('../config/database');
 
 class ActivityLog {
   static async create(data) {
-    const { staff_user_id, subscriber_id, action, details, ip_address } = data;
+    // NB: la tabella activity_logs non ha la colonna ip_address → non inserirla.
+    const { staff_user_id, subscriber_id, action, details } = data;
     await pool.execute(
-      'INSERT INTO activity_logs (staff_user_id, subscriber_id, action, details, ip_address) VALUES (?, ?, ?, ?, ?)',
-      [staff_user_id, subscriber_id || null, action, details ? JSON.stringify(details) : null, ip_address || null]
+      'INSERT INTO activity_logs (staff_user_id, subscriber_id, action, details) VALUES (?, ?, ?, ?)',
+      [staff_user_id ?? null, subscriber_id ?? null, action, details ? JSON.stringify(details) : null]
     );
   }
 
