@@ -205,7 +205,7 @@ export function Iscriviti() {
             className="mx-auto mb-8"
           />
           <h1 className="text-3xl sm:text-4xl md:text-6xl uppercase tracking-[0.15em] text-[#e6332a] mb-6">
-            Diventa socio/a/ə di Ekidna
+            Diventa sociə di Ekidna
           </h1>
           <div className="h-px w-32 bg-[#e6332a] mx-auto mb-6"></div>
           <p className="text-gray-400 max-w-2xl mx-auto">
@@ -217,7 +217,7 @@ export function Iscriviti() {
           {/* Intro */}
           <div className="border border-[#e6332a]/30 p-8 md:p-12 mb-12 bg-zinc-950/50 shadow-xl">
             <h2 className="text-2xl text-[#e6332a] mb-6 uppercase tracking-[0.15em]">
-              Diventa socio/a/ə di Associazione Ekidna
+              Diventa sociə di Associazione Ekidna
             </h2>
             <div className="h-px w-24 bg-[#e6332a] mb-8"></div>
             <p className="text-gray-400 leading-relaxed mb-6">
