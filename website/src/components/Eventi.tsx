@@ -62,8 +62,8 @@ export function Eventi() {
     <div className="min-h-screen pt-24 md:pt-32 pb-12">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16 border-2 border-[#d4a017] p-12 bg-black/60 backdrop-blur-sm shadow-2xl">
-          <h1 className="text-5xl md:text-7xl uppercase tracking-[0.2em] text-[#d4a017] mb-6">
+        <div className="text-center mb-10 md:mb-16 border-2 border-[#d4a017] p-6 sm:p-8 md:p-12 bg-black/60 backdrop-blur-sm shadow-2xl">
+          <h1 className="text-3xl sm:text-4xl md:text-7xl uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#d4a017] mb-6">
             Eventi
           </h1>
           <div className="h-px w-32 bg-[#d4a017] mx-auto mb-6"></div>
@@ -144,8 +144,8 @@ export function Eventi() {
         )}
 
         {/* Call to Action */}
-        <div className="mt-20 text-center border-2 border-[#d4a017] p-12 md:p-16 max-w-3xl mx-auto bg-black/60 backdrop-blur-sm shadow-2xl">
-          <h2 className="text-3xl md:text-4xl text-[#d4a017] mb-6 uppercase tracking-[0.2em]">
+        <div className="mt-20 text-center border-2 border-[#d4a017] p-6 sm:p-8 md:p-16 max-w-3xl mx-auto bg-black/60 backdrop-blur-sm shadow-2xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl text-[#d4a017] mb-6 uppercase tracking-[0.2em]">
             Proponi un Evento
           </h2>
           <div className="h-px w-32 bg-[#d4a017] mx-auto mb-8"></div>

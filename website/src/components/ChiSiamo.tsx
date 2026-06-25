@@ -5,8 +5,8 @@ export function ChiSiamo() {
     <div className="min-h-screen pt-24 md:pt-32 pb-12">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16 border-2 border-[#d4a017] p-12 bg-black/60 backdrop-blur-sm shadow-2xl">
-          <h1 className="text-5xl md:text-7xl uppercase tracking-[0.2em] text-[#d4a017] mb-6">
+        <div className="text-center mb-10 md:mb-16 border-2 border-[#d4a017] p-6 sm:p-8 md:p-12 bg-black/60 backdrop-blur-sm shadow-2xl">
+          <h1 className="text-3xl sm:text-4xl md:text-7xl uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#d4a017] mb-6">
             Chi Siamo
           </h1>
           <div className="h-px w-32 bg-[#d4a017] mx-auto mb-6"></div>
@@ -18,7 +18,7 @@ export function ChiSiamo() {
         {/* Storia */}
         <div className="max-w-4xl mx-auto mb-16">
           <div className="border border-[#d4a017]/30 p-8 md:p-12 bg-zinc-950/50 shadow-xl">
-            <h2 className="text-4xl md:text-5xl uppercase tracking-[0.2em] text-[#d4a017] mb-8">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#d4a017] mb-8">
               La Nostra Storia
             </h2>
             <div className="h-px w-24 bg-[#d4a017] mb-8"></div>
@@ -34,7 +34,7 @@ export function ChiSiamo() {
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
               <div className="p-8 md:p-12 bg-zinc-950 border border-[#d4a017]/30 shadow-xl">
-                <h2 className="text-4xl md:text-5xl uppercase tracking-[0.2em] text-[#d4a017] mb-6">
+                <h2 className="text-2xl sm:text-3xl md:text-5xl uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#d4a017] mb-6">
                   La Sede
                 </h2>
                 <div className="h-px w-24 bg-[#d4a017] mb-8"></div>
@@ -65,7 +65,7 @@ export function ChiSiamo() {
         {/* Gli Ideali */}
         <section className="py-16 md:py-24 bg-transparent">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-4xl md:text-5xl uppercase tracking-[0.2em] text-[#d4a017] mb-8 text-center">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#d4a017] mb-8 text-center">
               Gli Ideali
             </h2>
             <div className="h-px w-32 bg-[#d4a017] mx-auto mb-16"></div>
@@ -131,7 +131,7 @@ export function ChiSiamo() {
         {/* Le Persone */}
         <section className="py-16 bg-transparent">
           <div className="max-w-4xl mx-auto border border-[#d4a017]/30 p-8 md:p-12 bg-zinc-950/50 shadow-xl">
-            <h2 className="text-3xl md:text-4xl uppercase tracking-[0.2em] text-[#d4a017] mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl uppercase tracking-[0.2em] text-[#d4a017] mb-6">
               Le Persone
             </h2>
             <div className="h-px w-24 bg-[#d4a017] mb-8"></div>

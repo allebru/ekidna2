@@ -3,8 +3,8 @@ export function DoveSiamo() {
     <div className="min-h-screen pt-24 md:pt-32 pb-12">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16 border-2 border-[#d4a017] p-12 bg-black/60 backdrop-blur-sm shadow-2xl">
-          <h1 className="text-5xl md:text-7xl uppercase tracking-[0.2em] text-[#d4a017] mb-6">
+        <div className="text-center mb-10 md:mb-16 border-2 border-[#d4a017] p-6 sm:p-8 md:p-12 bg-black/60 backdrop-blur-sm shadow-2xl">
+          <h1 className="text-3xl sm:text-4xl md:text-7xl uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#d4a017] mb-6">
             Dove Siamo
           </h1>
           <div className="h-px w-32 bg-[#d4a017] mx-auto mb-6"></div>
@@ -22,7 +22,7 @@ export function DoveSiamo() {
               className="w-full h-auto"
             />
           </div>
-          <div className="border border-[#d4a017]/30 p-12 md:p-16 text-center bg-zinc-950/50 shadow-xl">
+          <div className="border border-[#d4a017]/30 p-6 sm:p-8 md:p-16 text-center bg-zinc-950/50 shadow-xl">
             <p className="text-gray-400 mb-4 uppercase tracking-wider">
               Ex scuola elementare di San Martino sulla Secchia
             </p>
@@ -36,7 +36,7 @@ export function DoveSiamo() {
         {/* Come raggiungere Ekidna */}
         <div className="max-w-4xl mx-auto">
           <div className="border border-[#d4a017]/30 p-8 md:p-12 mb-12 bg-zinc-950/50 shadow-xl">
-            <h2 className="text-3xl md:text-4xl text-[#d4a017] mb-4 uppercase tracking-[0.15em]">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl text-[#d4a017] mb-4 uppercase tracking-[0.15em]">
               Come raggiungere Ekidna
             </h2>
             <div className="h-px w-24 bg-[#d4a017] mb-6"></div>

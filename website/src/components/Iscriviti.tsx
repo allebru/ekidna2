@@ -80,7 +80,7 @@ export function Iscriviti() {
     <div className="min-h-screen pt-24 md:pt-32 pb-12">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16 border-2 border-[#d4a017] p-12 bg-black/60 backdrop-blur-sm shadow-2xl">
+        <div className="text-center mb-10 md:mb-16 border-2 border-[#d4a017] p-6 sm:p-8 md:p-12 bg-black/60 backdrop-blur-sm shadow-2xl">
           <img
             src="/logo/ekidna-icon.svg"
             alt=""
@@ -88,7 +88,7 @@ export function Iscriviti() {
             style={{ height: 'clamp(3.5rem, 8vw, 5rem)' }}
             className="mx-auto mb-8"
           />
-          <h1 className="text-4xl md:text-6xl uppercase tracking-[0.15em] text-[#d4a017] mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl uppercase tracking-[0.15em] text-[#d4a017] mb-6">
             Diventa socio/a/ə di Ekidna
           </h1>
           <div className="h-px w-32 bg-[#d4a017] mx-auto mb-6"></div>

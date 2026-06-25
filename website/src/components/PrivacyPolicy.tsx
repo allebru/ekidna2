@@ -5,7 +5,7 @@ export function PrivacyPolicy() {
     <div className="min-h-screen pt-24 md:pt-32 pb-16">
       <div className="container mx-auto px-4 max-w-3xl">
         <div className="text-center mb-12 border-2 border-[#d4a017] p-8 bg-black/60 backdrop-blur-sm">
-          <h1 className="text-4xl md:text-5xl uppercase tracking-[0.2em] text-[#d4a017] mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#d4a017] mb-4">
             Privacy Policy
           </h1>
           <div className="h-px w-24 bg-[#d4a017] mx-auto mb-4"></div>
