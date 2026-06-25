@@ -32,14 +32,17 @@ app.use(helmet({
   },
 }));
 
-// CORS configuration — allow all localhost ports in dev, restrict to FRONTEND_URL in prod
+// CORS configuration — i frontend sono serviti dallo stesso backend (same-origin),
+// quindi la CORS serve solo a eventuali client cross-origin. Per le origini non in
+// allowlist NON si blocca la richiesta (si omettono solo gli header CORS): così il
+// sito si carica anche dal dominio temporaneo Hostinger e l'health check non fallisce.
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true); // same-origin / curl
     const isLocalhost = /^https?:\/\/localhost(:\d+)?$/.test(origin);
-    const frontendUrl = process.env.FRONTEND_URL;
-    if (isLocalhost || origin === frontendUrl) return callback(null, true);
-    callback(new Error(`CORS: origin ${origin} not allowed`));
+    const allowed = [process.env.FRONTEND_URL, process.env.BACKEND_URL].filter(Boolean);
+    if (isLocalhost || allowed.includes(origin)) return callback(null, true);
+    return callback(null, false); // origine non consentita: niente header CORS, ma non errore
   },
   credentials: true
 }));
