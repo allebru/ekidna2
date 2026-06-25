@@ -113,17 +113,18 @@ class Subscriber {
     return Subscriber.findById(id);
   }
 
-  static async softDelete(id, deletedBy) {
+  static async softDelete(id) {
+    // NB: lo schema non ha deleted_at/deleted_by → si aggiorna solo lo status.
     await pool.execute(
-      "UPDATE subscribers SET status = 'deleted', deleted_at = CURRENT_TIMESTAMP, deleted_by = ? WHERE id = ? AND status != 'deleted'",
-      [deletedBy, id]
+      "UPDATE subscribers SET status = 'deleted' WHERE id = ? AND status != 'deleted'",
+      [id]
     );
     return Subscriber.findById(id);
   }
 
   static async restore(id) {
     await pool.execute(
-      "UPDATE subscribers SET status = 'active', deleted_at = NULL, deleted_by = NULL WHERE id = ? AND status = 'deleted'",
+      "UPDATE subscribers SET status = 'active' WHERE id = ? AND status = 'deleted'",
       [id]
     );
     return Subscriber.findById(id);
