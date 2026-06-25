@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const SubscriberController = require('../controllers/subscriberController');
 const { authenticateToken } = require('../middleware/auth');
@@ -8,9 +9,27 @@ const {
   validateQueryParams
 } = require('../middleware/validation');
 
+// Anti-abuso: limita gli invii pubblici del form (max 8/ora per IP)
+const createLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Troppe richieste di tesseramento da questo indirizzo. Riprova tra un\'ora.' },
+});
+
+// Honeypot anti-bot: il campo "website" e' nascosto nel form; se valorizzato e' un bot.
+// Rispondiamo con un finto successo per non segnalare il blocco.
+const honeypot = (req, res, next) => {
+  if (req.body && typeof req.body.website === 'string' && req.body.website.trim() !== '') {
+    return res.status(200).json({ success: true, message: 'Subscription created successfully' });
+  }
+  next();
+};
+
 // Public route - create subscriber from website form
 // POST /api/subscribers
-router.post('/', validateSubscriber, SubscriberController.create);
+router.post('/', createLimiter, honeypot, validateSubscriber, SubscriberController.create);
 
 // Protected routes (require authentication)
 // GET /api/subscribers - get all subscribers with pagination

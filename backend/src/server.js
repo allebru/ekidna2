@@ -16,6 +16,10 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Dietro il reverse-proxy di Hostinger: fidati del primo proxy per ottenere
+// l'IP reale del client (necessario al rate-limit per non contare tutti insieme).
+app.set('trust proxy', 1);
+
 // Security middleware
 // CSP su misura: i frontend serviti da Express usano asset same-origin,
 // Google Fonts (Space Grotesk) e stili inline (Tailwind/React).
