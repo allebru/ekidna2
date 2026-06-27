@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -54,10 +55,11 @@ const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const RE_TEL = /^[+]?[0-9\s().\-]{6,20}$/;
 
 export function Iscriviti() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>(initialData);
   const [errors, setErrors] = useState<Errors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'error'>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const validate = (): Errors => {
@@ -155,10 +157,7 @@ export function Iscriviti() {
 
       const response = await submitSubscription(subscriptionData);
       if (response.success) {
-        setSubmitStatus('success');
-        setFormData(initialData);
-        setErrors({});
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        navigate('/iscrizione-confermata');
       } else {
         setSubmitStatus('error');
         if (response.errorCode === 'DUPLICATE_EMAIL') {
@@ -405,11 +404,6 @@ export function Iscriviti() {
               </div>
 
               {/* Messaggi di stato */}
-              {submitStatus === 'success' && (
-                <div className="bg-black border border-green-600 p-4 text-green-500 text-sm uppercase tracking-wider">
-                  Grazie! La tua richiesta è stata inviata. Ti contatteremo presto.
-                </div>
-              )}
               {submitStatus === 'error' && submitError && (
                 <div className="bg-black border border-red-600 p-4 text-red-500 text-sm uppercase tracking-wider">
                   {submitError}

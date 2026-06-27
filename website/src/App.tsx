@@ -11,6 +11,7 @@ import { Galleria } from './components/Galleria';
 import { DoveSiamo } from './components/DoveSiamo';
 import { Contatti } from './components/Contatti';
 import { Iscriviti } from './components/Iscriviti';
+import { IscrizioneConfermata } from './components/IscrizioneConfermata';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { CookieBanner } from './components/CookieBanner';
 import { SiteContentProvider } from './context/SiteContentContext';
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/dove-siamo" element={<DoveSiamo />} />
             <Route path="/contatti" element={<Contatti />} />
             <Route path="/iscriviti" element={<Iscriviti />} />
+            <Route path="/iscrizione-confermata" element={<IscrizioneConfermata />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
