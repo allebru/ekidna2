@@ -35,11 +35,6 @@ class SubscriberController {
         emailService.sendSubscriptionConfirmation(subscriber).catch(err => {
           console.error('Failed to send confirmation email:', err);
         });
-
-        // Send notification to staff (async)
-        emailService.sendStaffNotification(subscriber).catch(err => {
-          console.error('Failed to send staff notification:', err);
-        });
       }
 
       res.status(201).json({

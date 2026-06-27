@@ -63,17 +63,20 @@ async function run() {
     // Seed admin user
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@ekidna.org';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-    const [rows] = await connection.query('SELECT id FROM staff_users WHERE email = ?', [adminEmail]);
+    const hash = await bcrypt.hash(adminPassword, 10);
+    const [rows] = await connection.query('SELECT id FROM staff_users WHERE role = ?', ['admin']);
     if (rows.length === 0) {
-      const hash = await bcrypt.hash(adminPassword, 10);
       await connection.query(
         `INSERT INTO staff_users (email, password_hash, name, role) VALUES (?, ?, ?, 'admin')`,
         [adminEmail, hash, 'Administrator']
       );
       console.log(`✓ Default admin created: ${adminEmail}`);
-      console.log('⚠️  Change the admin password after first login!');
     } else {
-      console.log(`✓ Admin user already exists: ${adminEmail}`);
+      await connection.query(
+        `UPDATE staff_users SET email = ?, password_hash = ? WHERE role = 'admin'`,
+        [adminEmail, hash]
+      );
+      console.log(`✓ Admin updated: ${adminEmail}`);
     }
 
     // Seed default site content
