@@ -1,7 +1,9 @@
-# Environment variables (never commit real secrets)
+# Environment variables (MAI committare segreti reali)
+# Il pattern senza slash ignora .env in QUALSIASI cartella (root, backend/, website/, MVP/)
 .env
 .env.local
 .env.*.local
+*.env
 
 # Dependencies
 node_modules/
@@ -9,6 +11,7 @@ node_modules/
 # Logs
 logs/
 *.log
+npm-debug.log*
 
 # OS files
 .DS_Store
@@ -17,22 +20,11 @@ Thumbs.db
 # Docker volumes
 postgres_data/
 
-# Uploaded files (managed on server, not in git)
+# Uploaded files (gestiti sul server, non in git)
 backend/public/uploads/
 
 # Temp files
 backend/tmp/
-
-# Tessera assets: ora committati (servono al backend per generare il PDF tessera).
-# Font BethEllen (OFL) + template PDF dell'associazione.
-
-# Build output
-# I frontend sono compilati in backend/public/{site,admin} e COMMITTATI:
-# il deploy del solo backend (Express) li serve come statici sullo stesso dominio
-# (sito pubblico alla root, MVP sotto /admin). backend/public/uploads resta ignorato.
-
-# Lock files (generated)
-package-lock.json
 
 # IDE
 .vscode/

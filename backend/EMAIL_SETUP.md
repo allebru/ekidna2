@@ -101,8 +101,8 @@ Example of a correctly configured `.env` file:
 ```bash
 EMAIL_HOST=smtp-relay.brevo.com
 EMAIL_PORT=587
-EMAIL_USER=alessandro@bruxstudio.it
-EMAIL_PASSWORD=xsmtpsib-df99787c74a234706134c2b760082e51ce2f9e1ceedc35244cd67dad840540d1-DB2pGEkd4xafo5ks
+EMAIL_USER=your-brevo-account-email@example.com
+EMAIL_PASSWORD=xsmtpsib-your-smtp-key-here
 EMAIL_FROM=noreply@ekidna.org
 ```
 
