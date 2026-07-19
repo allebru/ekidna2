@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 import { Header } from '../Header';
-import { Users } from 'lucide-react';
+import { Users, FileText, Search } from 'lucide-react';
 
-export type DashboardSection = 'iscritti';
+export type DashboardSection = 'iscritti' | 'contenuti' | 'seo';
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,6 +13,8 @@ interface LayoutProps {
 
 const NAV: { key: DashboardSection; label: string; icon: typeof Users }[] = [
   { key: 'iscritti', label: 'Iscritti', icon: Users },
+  { key: 'contenuti', label: 'Contenuti', icon: FileText },
+  { key: 'seo', label: 'SEO', icon: Search },
 ];
 
 export function Layout({ children, onLogout, section, onSectionChange }: LayoutProps) {

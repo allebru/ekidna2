@@ -73,17 +73,43 @@ app.use('/api', routes);
 // ---- Static frontends (produzione): un solo dominio per sito + MVP ----
 const websiteDir = path.join(__dirname, '../public/site');
 const mvpDir = path.join(__dirname, '../public/admin');
+const ssr = require('./services/ssr');
 
 // App gestionale (MVP) sotto /admin
 app.use('/admin', express.static(mvpDir));
 app.get('/admin/*', (req, res) => res.sendFile(path.join(mvpDir, 'index.html')));
 
-// Sito pubblico alla root
-app.use(express.static(websiteDir));
+// Sitemap generata dinamicamente dalle rotte note + eventi realmente presenti
+// (registrata prima dello static middleware così vince sempre lei).
+app.get('/sitemap.xml', async (req, res, next) => {
+  try {
+    const routes = await ssr.listKnownRoutes();
+    const baseUrl = process.env.SITE_URL || 'https://ekidnacarpi.it';
+    const urls = routes
+      .map((route) => `  <url><loc>${baseUrl}${route}</loc></url>`)
+      .join('\n');
+    res.type('application/xml').send(
+      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`
+    );
+  } catch (err) {
+    next(err);
+  }
+});
 
-// SPA fallback del sito pubblico: tutto ciò che NON è /api o /uploads → index.html
-app.get(/^(?!\/(?:api|uploads)\/).*/, (req, res) => {
-  res.sendFile(path.join(websiteDir, 'index.html'));
+// Asset compilati del sito pubblico (JS/CSS/immagini). `index: false` perché
+// l'HTML delle pagine non è più un file statico: viene renderizzato on-demand
+// da ssr.renderPage() con i meta/contenuti correnti dal CMS.
+app.use(express.static(websiteDir, { index: false }));
+
+// Pagine del sito pubblico: SSR on-demand (con cache) per tutto ciò che NON è
+// /api o /uploads. Rotte inesistenti ricevono un vero 404 (niente soft-404).
+app.get(/^(?!\/(?:api|uploads)\/).*/, async (req, res, next) => {
+  try {
+    const { status, html } = await ssr.renderPage(req.path);
+    res.status(status).send(html);
+  } catch (err) {
+    next(err);
+  }
 });
 
 // 404 handler (raggiunto solo da /api/* e /uploads/* non trovati)

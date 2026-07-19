@@ -1,23 +1,21 @@
 import { useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from './ui/dialog';
+import { useSiteContent } from '../context/SiteContentContext';
+
+type GalleryImage = { id: number; url: string; alt: string };
 
 export function Galleria() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const c = useSiteContent('galleria');
 
-  // Foto reali: sede Ekidna (sempre presente) + scatti dai nostri eventi
-  const galleryImages = [
-    { id: 1, url: '/img/ekidna-luogo.jpg', alt: 'La sede di Associazione Ekidna a San Martino sulla Secchia (Carpi)' },
-    { id: 2, url: '/img/gallery/g1.jpg', alt: 'Associazione Ekidna — evento' },
-    { id: 3, url: '/img/gallery/g2.jpg', alt: 'Associazione Ekidna — concerto' },
-    { id: 4, url: '/img/gallery/g3.jpg', alt: 'Associazione Ekidna — serata underground' },
-    { id: 5, url: '/img/gallery/g4.jpg', alt: 'Associazione Ekidna — live' },
-    { id: 6, url: '/img/gallery/g5.jpg', alt: 'Associazione Ekidna — pubblico' },
-    { id: 7, url: '/img/gallery/g6.jpg', alt: 'Associazione Ekidna — festival' },
-    { id: 8, url: '/img/gallery/g7.jpg', alt: 'Associazione Ekidna — spazio e attività' },
-    { id: 9, url: '/img/gallery/g8.jpg', alt: 'Associazione Ekidna — momenti dal circolo' },
-    { id: 10, url: '/img/gallery/g9.jpg', alt: 'Associazione Ekidna — il palco' },
-  ];
+  let galleryImages: GalleryImage[] = [];
+  try {
+    const parsed = JSON.parse(c.gallery_items ?? '[]');
+    if (Array.isArray(parsed)) galleryImages = parsed;
+  } catch {
+    galleryImages = [];
+  }
 
   return (
     <div className="min-h-screen pt-24 md:pt-32 pb-12">
@@ -41,6 +39,7 @@ export function Galleria() {
               <ImageWithFallback
                 src={image.url}
                 alt={image.alt}
+                loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
             </div>

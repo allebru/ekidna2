@@ -4,8 +4,12 @@
   import tailwindcss from '@tailwindcss/vite';
   import path from 'path';
 
-  export default defineConfig({
+  export default defineConfig(({ isSsrBuild }) => ({
     plugins: [react(), tailwindcss()],
+    // La build SSR non deve copiare website/public/* (immagini, robots.txt...):
+    // servono solo nella build client (backend/public/site), non nel bundle
+    // Node importato da backend/src/services/ssr.js.
+    publicDir: isSsrBuild ? false : undefined,
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
@@ -50,12 +54,31 @@
         '@': path.resolve(__dirname, './src'),
       },
     },
-    build: {
-      target: 'esnext',
-      // Compilato dentro il backend: Express serve il sito pubblico alla root
-      outDir: '../backend/public/site',
-      emptyOutDir: true,
-    },
+    ssr: isSsrBuild
+      ? {
+          // Il "server" che consuma questo bundle è backend/, un progetto npm
+          // separato senza react nei suoi node_modules: bundlizziamo tutto
+          // (react incluso) invece di lasciare gli import esterni.
+          noExternal: true,
+        }
+      : undefined,
+    build: isSsrBuild
+      ? {
+          // Bundle SSR: importato dinamicamente dal backend (backend/src/services/ssr.js)
+          // per renderToString() ad ogni richiesta pagina.
+          target: 'node18',
+          outDir: '../backend/src/ssr',
+          emptyOutDir: true,
+          rollupOptions: {
+            output: { entryFileNames: 'entry-server.mjs', format: 'es' },
+          },
+        }
+      : {
+          target: 'esnext',
+          // Compilato dentro il backend: Express serve il sito pubblico alla root
+          outDir: '../backend/public/site',
+          emptyOutDir: true,
+        },
     server: {
       port: 3000,
       open: true,
@@ -75,4 +98,4 @@
         },
       },
     },
-  });
+  }));

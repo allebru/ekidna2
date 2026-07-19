@@ -282,7 +282,7 @@ export function Iscriviti() {
               {/* Data di nascita: 3 menu (giorno / mese / anno) — comodo da telefono */}
               <div>
                 <Label className={labelCls}>Data di Nascita *</Label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <select name="giorno" aria-label="Giorno" value={formData.giorno}
                     onChange={handleChange} className={selectCls(!!errors.dataNascita)}>
                     <option value="">Giorno</option>

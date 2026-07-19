@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Layout, type DashboardSection } from './layout/Layout';
 import { SubscribersPage } from '../pages/SubscribersPage';
+import { ContentPage } from '../pages/ContentPage';
+import { SeoEditor } from '../pages/SeoEditor';
 
 interface DashboardProps {
   accessToken: string;
@@ -13,6 +15,8 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
   return (
     <Layout onLogout={onLogout} section={section} onSectionChange={setSection}>
       {section === 'iscritti' && <SubscribersPage accessToken={accessToken} />}
+      {section === 'contenuti' && <ContentPage />}
+      {section === 'seo' && <SeoEditor />}
     </Layout>
   );
 }
