@@ -1,7 +1,4 @@
-import { useSiteContent } from '../context/SiteContentContext';
-
 export function DoveSiamo() {
-  const c = useSiteContent('dove_siamo');
   return (
     <div className="min-h-screen pt-24 md:pt-32 pb-12">
       <div className="container mx-auto px-4">
@@ -12,7 +9,7 @@ export function DoveSiamo() {
           </h1>
           <div className="h-px w-32 bg-[#e6332a] mx-auto mb-6"></div>
           <div className="text-gray-400">
-            <p className="uppercase tracking-wider">{c.indirizzo}</p>
+            <p className="uppercase tracking-wider">Via Livorno 9, 41012 Carpi (MO)</p>
           </div>
         </div>
 
@@ -20,11 +17,8 @@ export function DoveSiamo() {
         <div className="max-w-4xl mx-auto mb-16">
           <div className="border-2 border-[#e6332a] mb-8 overflow-hidden shadow-2xl">
             <img
-              src={c.sede_immagine || '/img/ekidna-luogo.jpg'}
+              src="/img/ekidna-luogo.jpg"
               alt="La sede di Associazione Ekidna a San Martino sulla Secchia, Carpi"
-              width={1320}
-              height={1884}
-              loading="lazy"
               className="w-full h-auto"
             />
           </div>
@@ -50,7 +44,7 @@ export function DoveSiamo() {
               (da SESSUOLO.ORG)
             </p>
             <p className="text-gray-400 leading-relaxed">
-              {c.come_arrivare}
+              L'associazione Ekidna è un bel posto e lo abbiamo già detto nella recensione. Tuttavia, può non essere scontato come raggiungerla, specie quando c'è la nebbia o quando si vive in Costa d'Avorio: ecco dunque che Sessuolo.org offre una specie di guida Lonely Planet con i dieci migliori metodi per arrivare all'Ekidna di Carpi, diligentemente scelti per Voi dalla Redazione! Vai col televoto.
             </p>
           </div>
 

@@ -1,129 +1,552 @@
-# Ekidna2 — sito, tesseramento e CMS per Ekidna APS
+# Ekidna2 - Subscription Management System
 
-Sito pubblico, gestione iscritti e CMS interno per l'Associazione Ekidna APS (Carpi, MO).
+Complete web application for **Ekidna APS**, an Italian non-profit organization, to manage member subscriptions.
 
-## Cos'è
+## Overview
 
-Un unico backend Express serve tre cose sullo stesso dominio:
+This project consists of:
 
-1. **Sito pubblico** (`website/`) — home, chi siamo, eventi (con pagina singola per evento), galleria, dove siamo, contatti, tesseramento. Renderizzato **server-side** ad ogni richiesta (non è una SPA statica): ogni pagina arriva già con titolo, meta description, Open Graph e dati strutturati (JSON-LD) corretti, letti in tempo reale dal database.
-2. **Admin/CMS** (`MVP/`, servito sotto `/admin`) — pannello per lo staff: gestione iscritti, editing dei contenuti del sito (testi, immagini, eventi, galleria) senza toccare il codice, e un editor SEO per pagina con punteggio e consigli.
-3. **API** (`backend/`) — REST API che alimenta sia il sito (in SSR) che l'admin.
+1. **Public Website** - Information website where users can subscribe
+2. **MVP Dashboard** - Staff management portal for viewing and managing subscriptions
+3. **Backend API** - RESTful API with PostgreSQL database and email notifications
 
-Le modifiche fatte dallo staff nell'admin sono **immediatamente visibili** sul sito pubblico: non serve nessun rebuild o redeploy per cambiare un testo, un'immagine o i meta SEO di una pagina.
+## Features
 
-## Struttura del progetto
+### Public Website
+- Information pages (Chi Siamo, Eventi, Galleria, etc.)
+- Subscription form
+- Responsive design
+- Italian language
+
+### MVP Dashboard
+- Staff authentication (JWT)
+- View all subscribers with pagination
+- Search and filter capabilities
+- Create, update, and soft-delete subscribers
+- Statistics dashboard
+- Activity logs
+- Dark theme UI (yellow #FDB813 on black)
+
+### Backend API
+- RESTful API with Express.js
+- PostgreSQL database
+- JWT authentication
+- Email confirmation for new subscribers
+- Staff notifications
+- Soft delete support
+- Activity logging
+- Docker containerization
+
+## Project Structure
 
 ```
 ekidna2/
-├── backend/              # Express + MySQL — API, SSR, invio email, PDF tessera
+├── backend/              # Node.js/Express API
 │   ├── src/
-│   │   ├── config/       # connessione DB, JWT, email
-│   │   ├── controllers/  # handler delle route
-│   │   ├── models/       # accesso al DB (classi con metodi statici)
-│   │   ├── routes/       # definizione degli endpoint /api/*
-│   │   ├── middleware/   # auth JWT, validazione, error handling
-│   │   ├── services/     # ssr.js (rendering pagine), ssrCache.js, email, pdf
-│   │   ├── ssr/           # bundle SSR compilato da website/ (generato, non editare a mano)
-│   │   └── server.js     # entry point Express
-│   ├── migrations/       # schema DB + seed iniziale
-│   └── public/
-│       ├── site/         # build compilata di website/ (committata in git)
-│       ├── admin/        # build compilata di MVP/ (committata in git)
-│       └── uploads/      # immagini caricate dallo staff (NON in git)
+│   │   ├── config/      # Database, email, JWT config
+│   │   ├── controllers/ # Route handlers
+│   │   ├── models/      # Database models
+│   │   ├── routes/      # API routes
+│   │   ├── middleware/  # Auth, validation, errors
+│   │   ├── services/    # Email service
+│   │   └── server.js    # Entry point
+│   ├── migrations/      # Database schema
+│   └── Dockerfile
 │
-├── website/              # Sito pubblico — React + Vite, SSR con react-dom/server
-│   └── src/
-│       ├── components/    # pagine e componenti
-│       ├── context/       # SiteContentContext (dati CMS lato client)
-│       ├── entry-client.tsx  # hydration nel browser
-│       └── entry-server.tsx  # rendering lato server (bundle separato)
+├── website/             # Public website (React)
+│   ├── src/
+│   │   ├── components/  # React components
+│   │   └── styles/      # CSS/Tailwind
+│   └── package.json
 │
-├── MVP/                  # Admin/CMS — React + Vite, SPA client-side
-│   └── src/
-│       ├── pages/         # ContentPage (editor contenuti), SeoEditor, SubscribersPage
-│       └── components/
+├── MVP/                 # Staff dashboard (React)
+│   ├── src/
+│   │   ├── components/  # React components
+│   │   ├── pages/       # Page components
+│   │   └── utils/       # Utilities
+│   └── package.json
 │
-└── server.js             # entry point di deploy: avvia backend/src/server.js
+├── docker-compose.yml   # Docker orchestration
+├── .env.example         # Environment template
+├── DEPLOYMENT.md        # VPS deployment guide
+└── README.md            # This file
 ```
 
-## Stack tecnico
+## Tech Stack
 
-- **Backend:** Node.js, Express, MySQL (`mysql2`), JWT, Nodemailer, `pdf-lib` (generazione tessera)
-- **Sito pubblico:** React 18, React Router 7, Vite, Tailwind CSS — con SSR reale (`react-dom/server`, niente browser headless)
-- **Admin:** React 18, Vite, Tailwind CSS, componenti shadcn/ui
-- **Database:** MySQL — tabelle principali: `site_content` (testi/immagini per pagina), `page_seo` (meta SEO per pagina), `subscribers`, `staff_users`, `activity_logs`
+### Frontend
+- **Framework:** React 18.3.1
+- **Build Tool:** Vite 6.3.5
+- **Language:** TypeScript
+- **UI Library:** Shadcn/UI + Radix UI
+- **Styling:** Tailwind CSS
+- **Router:** React Router (website)
 
-## Avvio in locale
+### Backend
+- **Runtime:** Node.js 20
+- **Framework:** Express.js 4
+- **Database:** PostgreSQL 16
+- **ORM:** pg (native driver)
+- **Auth:** JWT + bcryptjs
+- **Email:** Nodemailer
+- **Validation:** express-validator
 
-Serve un database MySQL raggiungibile (locale, o un container Docker usa-e-getta). Esempio rapido con Docker:
+### Infrastructure
+- **Containers:** Docker & Docker Compose
+- **Database UI:** Adminer (development)
+- **Reverse Proxy:** Nginx (production)
+- **SSL:** Let's Encrypt
+
+## Quick Start
+
+### Prerequisites
+
+- **Node.js** 20+ installed
+- **Docker** and **Docker Compose** installed
+- **Git** installed
+
+### 1. Clone Repository
 
 ```bash
-docker run --rm -d --name ekidna-db \
-  -e MYSQL_ROOT_PASSWORD=rootpass -e MYSQL_DATABASE=ekidna_db \
-  -e MYSQL_USER=ekidna_user -e MYSQL_PASSWORD=ekidna_pass \
-  -p 3307:3306 mysql:8.0 --default-authentication-plugin=mysql_native_password
+git clone https://github.com/your-repo/ekidna2.git
+cd ekidna2
 ```
 
-Poi, dalla **root del repository** (non in `backend/`: le variabili d'ambiente vengono lette da lì):
+### 2. Configure Environment
 
 ```bash
-cat > .env <<'EOF'
-DB_HOST=127.0.0.1
-DB_PORT=3307
+cp .env.example .env
+```
+
+Edit `.env` with your settings:
+
+```env
+# Database
 DB_NAME=ekidna_db
 DB_USER=ekidna_user
-DB_PASSWORD=ekidna_pass
-NODE_ENV=development
-PORT=3001
-JWT_SECRET=cambia-questa-stringa
-FRONTEND_URL=http://localhost:3001
-SITE_URL=http://localhost:3001
-ADMIN_EMAIL=admin@ekidna.org
-ADMIN_PASSWORD=admin123
-EOF
+DB_PASSWORD=your_password
 
-cd backend
+# JWT
+JWT_SECRET=your-secret-key
+
+# Email (Gmail)
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+EMAIL_FROM=noreply@ekidna.org
+
+# Frontend
+FRONTEND_URL=http://localhost:3000
+```
+
+### 3. Start Backend
+
+```bash
+# Start PostgreSQL + Backend + Adminer
+docker-compose up -d
+
+# Check if running
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+```
+
+Backend will be available at: http://localhost:3001/api
+
+### 4. Start Website
+
+```bash
+cd website
 npm install
-npm run migrate      # crea schema + utente admin + contenuti di default
-npm start             # backend + sito + admin, tutto su http://localhost:3001
+npm run dev
 ```
 
-Poi apri:
-- **Sito pubblico:** http://localhost:3001
-- **Admin:** http://localhost:3001/admin (login: `admin@ekidna.org` / `admin123`, da cambiare al primo accesso)
+Website will be available at: http://localhost:5173
 
-### Sviluppare sul sito o sull'admin (con hot-reload)
-
-Il sito pubblico e l'admin, quando si edita la UI, si possono lanciare anche con il dev server Vite (più comodo per iterare sulla grafica, ma senza SSR):
+### 5. Start MVP Dashboard
 
 ```bash
-cd website && npm run dev     # http://localhost:3000, proxy /api verso :3001
-cd MVP && npm run dev         # dev server dell'admin, stesso proxy
+cd MVP
+npm install
+npm run dev
 ```
 
-Il backend (`npm start` in `backend/`, o l'app completa da root) deve restare attivo per le chiamate API.
+MVP will be available at: http://localhost:5174
 
-### Ricompilare dopo una modifica al codice del sito o dell'admin
+## Default Admin Credentials
 
-I frontend sono **committati già compilati** in `backend/public/site` e `backend/public/admin` (il deploy non fa build, serve solo `npm install` sul backend). Dopo una modifica va rigenerata la build:
+**Email:** admin@ekidna.org
+**Password:** admin123
+
+⚠️ **Change this password immediately after first login!**
+
+## API Documentation
+
+### Public Endpoints
+
+#### Subscribe (from website)
+```bash
+POST http://localhost:3001/api/subscribers
+Content-Type: application/json
+
+{
+  "name": "Marco Rossi",
+  "email": "marco.rossi@example.com",
+  "phone": "+39 333 1234567",
+  "address": "Via Roma 1, Milano, 20121",
+  "subscription_year": 2025
+}
+```
+
+### Authentication
+
+#### Login
+```bash
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@ekidna.org",
+  "password": "admin123"
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "uuid",
+    "email": "admin@ekidna.org",
+    "name": "Administrator",
+    "role": "admin"
+  }
+}
+```
+
+### Protected Endpoints
+
+Use the token in Authorization header:
+```
+Authorization: Bearer <your-token>
+```
+
+#### Get Subscribers
+```bash
+GET http://localhost:3001/api/subscribers?page=1&limit=50
+```
+
+#### Get Statistics
+```bash
+GET http://localhost:3001/api/subscribers/stats
+```
+
+#### Update Subscriber
+```bash
+PUT http://localhost:3001/api/subscribers/:id
+Content-Type: application/json
+
+{
+  "name": "Marco Rossi Updated",
+  "subscription_year": 2025
+}
+```
+
+#### Delete Subscriber (Soft)
+```bash
+DELETE http://localhost:3001/api/subscribers/:id
+```
+
+Full API documentation: http://localhost:3001/api
+
+## Email Setup
+
+### Using Gmail
+
+1. Enable 2-Factor Authentication in your Google account
+2. Generate an App Password: https://myaccount.google.com/apppasswords
+3. Add credentials to `.env`:
+
+```env
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-16-digit-app-password
+```
+
+### Email Templates
+
+The system sends:
+1. **Confirmation email** to subscribers (Italian)
+2. **Notification email** to staff when new subscription is created
+
+Templates can be customized in `backend/src/config/email.js`.
+
+## Database Management
+
+### Using Adminer (Web UI)
+
+1. Open http://localhost:8080
+2. Login with:
+   - System: PostgreSQL
+   - Server: db
+   - Username: ekidna_user
+   - Password: (from .env)
+   - Database: ekidna_db
+
+### Using Command Line
 
 ```bash
-cd website && npm run build   # build client + bundle SSR in un colpo
-cd MVP && npm run build
+# Connect to database
+docker exec -it ekidna_db psql -U ekidna_user -d ekidna_db
+
+# Backup database
+docker exec ekidna_db pg_dump -U ekidna_user ekidna_db > backup.sql
+
+# Restore database
+docker exec -i ekidna_db psql -U ekidna_user -d ekidna_db < backup.sql
 ```
 
-## Deploy
+## Building for Production
 
-Vedi [DEPLOYMENT_HOSTINGER.md](./DEPLOYMENT_HOSTINGER.md) — il target di produzione è Hostinger hosting condiviso (Node via hPanel), un solo processo Express per tutto, niente Docker/VPS in produzione. Il deploy è **automatico**: l'app è collegata al repository git, un push fa pull + riavvio da sola, e con `AUTO_MIGRATE=true` nell'`.env` di produzione anche la migrazione del database parte da sola ad ogni riavvio.
+### Build Backend
 
-## Documentazione correlata
+Backend runs in Docker, no separate build needed.
 
-- [backend/README.md](./backend/README.md) — API, modelli dati, comandi di sviluppo del backend
-- [backend/EMAIL_SETUP.md](./backend/EMAIL_SETUP.md) — configurazione SMTP (Brevo) per le email di conferma tesseramento
-- [DEPLOYMENT_HOSTINGER.md](./DEPLOYMENT_HOSTINGER.md) — procedura di deploy in produzione
+```bash
+docker-compose up -d --build
+```
 
-## Sicurezza — prima di andare in produzione
+### Build Website
 
-- [ ] `ADMIN_PASSWORD` e `JWT_SECRET` nel `.env` di produzione sono già i valori reali in uso (non i default di sviluppo) — con `AUTO_MIGRATE=true` vengono riapplicati ad ogni riavvio, quindi devono restare sempre aggiornati se cambi la password dall'interfaccia
-- [ ] `SITE_URL` nel `.env` di produzione è il dominio reale (`https://ekidnacarpi.it`) — viene usato per sitemap, canonical e Open Graph
+```bash
+cd website
+npm install
+npm run build
+# Output: website/dist/
+```
+
+### Build MVP
+
+```bash
+cd MVP
+npm install
+npm run build
+# Output: MVP/dist/
+```
+
+## Deployment
+
+This project is designed to be deployed on **Hostinger VPS** (or any VPS provider).
+
+### Quick Deployment Steps
+
+1. **Setup VPS** - Install Docker, Nginx, and SSL
+2. **Clone repository** to VPS
+3. **Configure environment** - Update `.env` with production values
+4. **Start services** - `docker-compose up -d`
+5. **Setup Nginx** - Configure reverse proxy
+6. **Setup SSL** - Use Let's Encrypt with Certbot
+7. **Build frontends** - Build and serve with Nginx
+
+📖 **Full deployment guide:** [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+## Development
+
+### Backend Development
+
+```bash
+cd backend
+
+# Install dependencies
+npm install
+
+# Run with auto-reload
+npm run dev
+
+# Generate password hash
+node src/utils/hashPassword.js
+```
+
+### View Logs
+
+```bash
+# All services
+docker-compose logs -f
+
+# Backend only
+docker-compose logs -f backend
+
+# Database only
+docker-compose logs -f db
+```
+
+### Database Migrations
+
+The database schema is automatically initialized from `backend/migrations/init.sql` when the database container starts for the first time.
+
+To reset the database:
+
+```bash
+# Stop and remove containers
+docker-compose down
+
+# Remove database volume
+docker volume rm ekidna2_postgres_data
+
+# Start fresh
+docker-compose up -d
+```
+
+## Troubleshooting
+
+### Backend won't start
+
+```bash
+# Check logs
+docker-compose logs backend
+
+# Common issues:
+# - Database not ready: Wait a few seconds
+# - Port 3001 in use: Change port in docker-compose.yml
+# - .env missing: Copy from .env.example
+```
+
+### Cannot connect to database
+
+```bash
+# Check if database is running
+docker-compose ps
+
+# Check database logs
+docker-compose logs db
+
+# Verify connection
+docker exec -it ekidna_db psql -U ekidna_user -d ekidna_db
+```
+
+### Email not sending
+
+- Verify EMAIL_USER and EMAIL_PASSWORD in `.env`
+- Check if using Gmail App Password (not regular password)
+- Email service is optional - API works without it
+- Check backend logs: `docker-compose logs backend`
+
+### Frontend can't connect to API
+
+- Verify backend is running: `curl http://localhost:3001/api/health`
+- Check CORS settings in `backend/src/server.js`
+- Update API URL in frontend configuration
+
+## Project Architecture
+
+### Data Flow
+
+```
+User submits form on Website
+         ↓
+Backend API receives request
+         ↓
+Saves to PostgreSQL database
+         ↓
+Sends confirmation email to user
+         ↓
+Sends notification email to staff
+         ↓
+Staff views in MVP Dashboard
+```
+
+### Authentication Flow
+
+```
+Staff logs in via MVP
+         ↓
+Backend verifies credentials
+         ↓
+Returns JWT token
+         ↓
+MVP stores token
+         ↓
+All API requests include token
+         ↓
+Backend validates token
+         ↓
+Returns protected data
+```
+
+## Security
+
+### Best Practices Implemented
+
+- JWT authentication for staff
+- Password hashing with bcrypt
+- Input validation with express-validator
+- SQL injection prevention (parameterized queries)
+- CORS configuration
+- Helmet.js for security headers
+- Environment variables for secrets
+- Soft delete (data retention)
+- Activity logging
+
+### Security Checklist
+
+Before going to production:
+
+- [ ] Change default admin password
+- [ ] Update JWT_SECRET to strong random string
+- [ ] Use strong database password
+- [ ] Set NODE_ENV=production
+- [ ] Enable HTTPS/SSL
+- [ ] Configure firewall
+- [ ] Setup database backups
+- [ ] Review CORS settings
+- [ ] Disable Adminer in production
+
+## Testing
+
+### Test Backend API
+
+```bash
+# Health check
+curl http://localhost:3001/api/health
+
+# Create subscriber
+curl -X POST http://localhost:3001/api/subscribers \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test User",
+    "email": "test@example.com",
+    "subscription_year": 2025
+  }'
+
+# Login
+curl -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@ekidna.org",
+    "password": "admin123"
+  }'
+```
+
+## Support & Documentation
+
+- **Backend README:** [backend/README.md](./backend/README.md)
+- **Deployment Guide:** [DEPLOYMENT.md](./DEPLOYMENT.md)
+- **API Documentation:** http://localhost:3001/api
+- **Database Schema:** [backend/migrations/init.sql](./backend/migrations/init.sql)
+
+## License
+
+MIT License - Ekidna APS
+
+## Contributors
+
+- Backend Architecture & Implementation
+- Frontend Integration
+- Docker Configuration
+- Deployment Setup
+
+---
+
+**Made with ❤️ for Ekidna APS**

@@ -4,7 +4,6 @@ const router = express.Router();
 const authRoutes = require('./auth');
 const subscriberRoutes = require('./subscribers');
 const contentRoutes = require('./content');
-const seoRoutes = require('./seo');
 const uploadRoutes = require('./upload');
 const testRoutes = require('./test');
 
@@ -12,7 +11,6 @@ const testRoutes = require('./test');
 router.use('/auth', authRoutes);
 router.use('/subscribers', subscriberRoutes);
 router.use('/content', contentRoutes);
-router.use('/seo', seoRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/test', testRoutes);
 

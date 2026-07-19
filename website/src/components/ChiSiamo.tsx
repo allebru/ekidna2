@@ -1,8 +1,6 @@
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { useSiteContent } from '../context/SiteContentContext';
 
 export function ChiSiamo() {
-  const c = useSiteContent('chi_siamo');
   return (
     <div className="min-h-screen pt-24 md:pt-32 pb-12">
       <div className="container mx-auto px-4">
@@ -26,7 +24,7 @@ export function ChiSiamo() {
             <div className="h-px w-24 bg-[#e6332a] mb-8"></div>
             
             <p className="text-gray-400 leading-relaxed mb-6">
-              {c.storia_testo}
+              Ekidna nasce nel 1998 da alcune persone che, volendo accomunare i loro interessi per la musica e i valori della cultura underground, hanno creato un'associazione non a scopo di lucro dove chi vuole può incontrarsi liberamente per condividere gli ideali di antifascismo, transfemminismo, ecologia, DIY e promozione dell'arte a livello locale (musica, teatro, arti figurative…).
             </p>
           </div>
         </div>
@@ -41,15 +39,22 @@ export function ChiSiamo() {
                 </h2>
                 <div className="h-px w-24 bg-[#e6332a] mb-8"></div>
                 <div className="space-y-6 text-gray-400 leading-relaxed">
-                  <p>{c.sede_testo}</p>
+                  <p>
+                    Dapprima in maniera errante spostandosi nella bassa modenese, Ekidna si stabilisce nell'ex scuola elementare di San Martino sulla Secchia, concessa in comodato d'uso gratuito dal Comune di Carpi.
+                  </p>
+                  <p>
+                    L'edificio diroccato viene quindi ristrutturato dall3 volontari3 e riconvertito in una struttura funzionante capace di ospitare eventi e laboratori (serigrafia e fotografia).
+                  </p>
+                  <p>
+                    Il luogo è stato scelto per la sua struttura unica e affascinante nel bel mezzo della campagna, per dare la massima libertà di espressione alle iniziative e per poter godere del grande giardino che tutti gli anni ospita i nostri festival estivi.
+                  </p>
                 </div>
               </div>
-
+              
               <div className="border border-[#e6332a]/30 overflow-hidden shadow-xl">
                 <ImageWithFallback
-                  src={c.sede_immagine || '/img/ekidna-luogo.jpg'}
+                  src="/img/ekidna-luogo.jpg"
                   alt="La sede di Associazione Ekidna a San Martino sulla Secchia (Carpi)"
-                  loading="lazy"
                   className="w-full h-full object-cover min-h-[400px]"
                 />
               </div>

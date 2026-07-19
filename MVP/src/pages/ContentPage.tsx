@@ -1,22 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Save, CheckCircle, AlertCircle, Plus, Trash2 } from 'lucide-react';
-import apiClient from '../config/api';
-import { ImageUploadField } from '../components/ImageUploadField';
+import { Save, CheckCircle, AlertCircle, Plus, Trash2, Upload, Loader2 } from 'lucide-react';
+import apiClient, { getToken } from '../config/api';
 
-// Tutte le pagine editoriali del sito. Privacy Policy e le voci di
-// menu/footer restano gestite da codice (testo legale / struttura di
-// navigazione, non pensati per l'editing frequente da parte dello staff).
+// Solo le pagine che il sito legge DAVVERO dal CMS.
+// Chi Siamo / Eventi / Galleria / Dove Siamo sono fissi nel frontend
+// (testi, flyer, foto reali) e non passano dal CMS → non vanno mostrati qui.
 const PAGES: { key: string; label: string }[] = [
   { key: 'home', label: 'Home' },
-  { key: 'chi_siamo', label: 'Chi Siamo' },
-  { key: 'eventi', label: 'Eventi' },
-  { key: 'galleria', label: 'Galleria' },
-  { key: 'dove_siamo', label: 'Dove Siamo' },
   { key: 'contatti', label: 'Contatti' },
 ];
 
@@ -24,86 +19,15 @@ type FieldMeta = { content_type: string; label: string; value: string; sort_orde
 type PageMeta = Record<string, FieldMeta>;
 type AllMeta = Record<string, PageMeta>;
 
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
 // ── Evento editor ────────────────────────────────────────────────
-type EventoRecord = {
-  id: number;
-  slug: string;
-  title: string;
-  date: string;
-  endDate: string;
-  dateLabel: string;
-  genre: string;
-  image: string;
-  description: string;
-  lineup: string[];
-  info: string[];
-  link: string;
-};
-
-function emptyEvento(): EventoRecord {
-  return {
-    id: Date.now(),
-    slug: '',
-    title: '',
-    date: '',
-    endDate: '',
-    dateLabel: '',
-    genre: '',
-    image: '',
-    description: '',
-    lineup: [],
-    info: [],
-    link: '',
-  };
-}
-
-function RepeatableTextList({ items, onChange, addLabel }: { items: string[]; onChange: (v: string[]) => void; addLabel: string }) {
-  return (
-    <div className="space-y-2">
-      {items.map((line, i) => (
-        <div key={i} className="flex gap-2">
-          <Input
-            value={line}
-            onChange={(e) => {
-              const copy = [...items]; copy[i] = e.target.value; onChange(copy);
-            }}
-            className="bg-zinc-800 border-zinc-700 text-white text-sm flex-1"
-          />
-          <button onClick={() => onChange(items.filter((_, idx) => idx !== i))} className="text-red-500 hover:text-red-400 flex-shrink-0">
-            <Trash2 size={16} />
-          </button>
-        </div>
-      ))}
-      <Button onClick={() => onChange([...items, ''])} variant="outline" size="sm" className="border-[#d4a017]/50 text-[#d4a017] hover:bg-[#d4a017]/10">
-        <Plus size={14} className="mr-1" /> {addLabel}
-      </Button>
-    </div>
-  );
-}
-
 function EventiEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const [events, setEvents] = useState<EventoRecord[]>(() => {
-    try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed.map((e) => ({ ...emptyEvento(), ...e })) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [events, setEvents] = useState<any[]>(() => { try { return JSON.parse(value) || []; } catch { return []; } });
 
-  const update = (list: EventoRecord[]) => { setEvents(list); onChange(JSON.stringify(list)); };
-  const add = () => update([...events, emptyEvento()]);
+  const update = (list: any[]) => { setEvents(list); onChange(JSON.stringify(list)); };
+  const add = () => update([...events, { id: Date.now(), title: '', date: '', time: '', genre: '', description: '' }]);
   const remove = (i: number) => update(events.filter((_, idx) => idx !== i));
-  const set = (i: number, field: keyof EventoRecord, v: string | string[]) => {
-    const copy = [...events]; copy[i] = { ...copy[i], [field]: v } as EventoRecord; update(copy);
+  const set = (i: number, field: string, v: string) => {
+    const copy = [...events]; copy[i] = { ...copy[i], [field]: v }; update(copy);
   };
 
   return (
@@ -114,69 +38,13 @@ function EventiEditor({ value, onChange }: { value: string; onChange: (v: string
             <span className="text-[#d4a017] text-sm font-semibold uppercase tracking-wider">Evento {i + 1}</span>
             <button onClick={() => remove(i)} className="text-red-500 hover:text-red-400"><Trash2 size={16} /></button>
           </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <Label className="text-xs text-gray-400">Titolo</Label>
-              <Input
-                value={ev.title}
-                onChange={(e) => {
-                  const title = e.target.value;
-                  const copy = [...events];
-                  copy[i] = { ...copy[i], title, slug: copy[i].slug || slugify(title) };
-                  update(copy);
-                }}
-                className="bg-zinc-800 border-zinc-700 text-white mt-1"
-              />
-            </div>
-            <div>
-              <Label className="text-xs text-gray-400">Slug URL (/eventi/...)</Label>
-              <Input value={ev.slug} onChange={(e) => set(i, 'slug', slugify(e.target.value))} className="bg-zinc-800 border-zinc-700 text-white mt-1" />
-            </div>
-            <div>
-              <Label className="text-xs text-gray-400">Genere</Label>
-              <Input value={ev.genre} onChange={(e) => set(i, 'genre', e.target.value)} className="bg-zinc-800 border-zinc-700 text-white mt-1" />
-            </div>
-            <div>
-              <Label className="text-xs text-gray-400">Data testo (mostrata sul sito)</Label>
-              <Input value={ev.dateLabel} onChange={(e) => set(i, 'dateLabel', e.target.value)} placeholder="25 – 28 Giugno 2026" className="bg-zinc-800 border-zinc-700 text-white mt-1" />
-            </div>
-            <div>
-              <Label className="text-xs text-gray-400">Data inizio</Label>
-              <Input type="date" value={ev.date} onChange={(e) => set(i, 'date', e.target.value)} className="bg-zinc-800 border-zinc-700 text-white mt-1" />
-            </div>
-            <div>
-              <Label className="text-xs text-gray-400">Data fine (se più giorni)</Label>
-              <Input type="date" value={ev.endDate} onChange={(e) => set(i, 'endDate', e.target.value)} className="bg-zinc-800 border-zinc-700 text-white mt-1" />
-            </div>
+            <div><Label className="text-xs text-gray-400">Titolo</Label><Input value={ev.title} onChange={e => set(i, 'title', e.target.value)} className="bg-zinc-800 border-zinc-700 text-white mt-1" /></div>
+            <div><Label className="text-xs text-gray-400">Genere</Label><Input value={ev.genre} onChange={e => set(i, 'genre', e.target.value)} className="bg-zinc-800 border-zinc-700 text-white mt-1" /></div>
+            <div><Label className="text-xs text-gray-400">Data</Label><Input type="date" value={ev.date} onChange={e => set(i, 'date', e.target.value)} className="bg-zinc-800 border-zinc-700 text-white mt-1" /></div>
+            <div><Label className="text-xs text-gray-400">Ora</Label><Input value={ev.time} onChange={e => set(i, 'time', e.target.value)} placeholder="21:00" className="bg-zinc-800 border-zinc-700 text-white mt-1" /></div>
           </div>
-
-          <div>
-            <Label className="text-xs text-gray-400">Locandina</Label>
-            <div className="mt-1">
-              <ImageUploadField value={ev.image} onChange={(v) => set(i, 'image', v)} />
-            </div>
-          </div>
-
-          <div>
-            <Label className="text-xs text-gray-400">Descrizione</Label>
-            <Textarea value={ev.description} onChange={(e) => set(i, 'description', e.target.value)} rows={2} className="bg-zinc-800 border-zinc-700 text-white mt-1 resize-none" />
-          </div>
-
-          <div>
-            <Label className="text-xs text-gray-400 mb-1 block">Line-up (una riga per giorno/fascia)</Label>
-            <RepeatableTextList items={ev.lineup} onChange={(v) => set(i, 'lineup', v)} addLabel="Aggiungi riga line-up" />
-          </div>
-
-          <div>
-            <Label className="text-xs text-gray-400 mb-1 block">Info (biglietti, orari, note)</Label>
-            <RepeatableTextList items={ev.info} onChange={(v) => set(i, 'info', v)} addLabel="Aggiungi riga info" />
-          </div>
-
-          <div>
-            <Label className="text-xs text-gray-400">Link esterno (biglietti / evento Facebook)</Label>
-            <Input value={ev.link} onChange={(e) => set(i, 'link', e.target.value)} className="bg-zinc-800 border-zinc-700 text-white mt-1" />
-          </div>
+          <div><Label className="text-xs text-gray-400">Descrizione</Label><Textarea value={ev.description} onChange={e => set(i, 'description', e.target.value)} rows={2} className="bg-zinc-800 border-zinc-700 text-white mt-1 resize-none" /></div>
         </div>
       ))}
       <Button onClick={add} variant="outline" size="sm" className="border-[#d4a017]/50 text-[#d4a017] hover:bg-[#d4a017]/10">
@@ -187,8 +55,12 @@ function EventiEditor({ value, onChange }: { value: string; onChange: (v: string
 }
 
 // ── Galleria editor ──────────────────────────────────────────────
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
+
 function GalleriaEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [items, setItems] = useState<any[]>(() => { try { return JSON.parse(value) || []; } catch { return []; } });
+  const [uploading, setUploading] = useState<number | null>(null);
+  const fileRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const update = (list: any[]) => { setItems(list); onChange(JSON.stringify(list)); };
   const add = () => update([...items, { id: Date.now(), url: '', alt: '' }]);
@@ -197,13 +69,62 @@ function GalleriaEditor({ value, onChange }: { value: string; onChange: (v: stri
     const copy = [...items]; copy[i] = { ...copy[i], [field]: v }; update(copy);
   };
 
+  const handleUpload = async (i: number, file: File) => {
+    setUploading(i);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await fetch(`${API_BASE}/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${getToken()}` },
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.url) set(i, 'url', data.url);
+      else alert(data.error || 'Errore upload');
+    } catch {
+      alert('Errore durante il caricamento');
+    } finally {
+      setUploading(null);
+    }
+  };
+
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
         <div key={item.id} className="border border-[#d4a017]/20 p-3 bg-zinc-900 space-y-2">
-          <ImageUploadField value={item.url} onChange={(v) => set(i, 'url', v)} />
-          <div className="flex gap-2">
-            <Input value={item.alt} onChange={(e) => set(i, 'alt', e.target.value)} placeholder="Descrizione immagine" className="bg-zinc-800 border-zinc-700 text-white text-sm flex-1" />
+          <div className="flex gap-2 items-center">
+            {/* Anteprima */}
+            {item.url && (
+              <img src={item.url} alt={item.alt} className="w-16 h-16 object-cover rounded border border-zinc-700 flex-shrink-0" onError={e => (e.currentTarget.style.display = 'none')} />
+            )}
+            <div className="flex-1 space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  value={item.url}
+                  onChange={e => set(i, 'url', e.target.value)}
+                  placeholder="URL immagine (https://...)"
+                  className="bg-zinc-800 border-zinc-700 text-white text-sm flex-1"
+                />
+                {/* Upload button */}
+                <button
+                  title="Carica dal computer"
+                  onClick={() => fileRefs.current[i]?.click()}
+                  disabled={uploading === i}
+                  className="px-3 py-2 border border-[#d4a017]/50 text-[#d4a017] hover:bg-[#d4a017]/10 disabled:opacity-50 flex-shrink-0"
+                >
+                  {uploading === i ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                </button>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  className="hidden"
+                  ref={el => { fileRefs.current[i] = el; }}
+                  onChange={e => e.target.files?.[0] && handleUpload(i, e.target.files[0])}
+                />
+              </div>
+              <Input value={item.alt} onChange={e => set(i, 'alt', e.target.value)} placeholder="Descrizione immagine" className="bg-zinc-800 border-zinc-700 text-white text-sm" />
+            </div>
             <button onClick={() => remove(i)} className="text-red-500 hover:text-red-400 flex-shrink-0"><Trash2 size={16} /></button>
           </div>
         </div>
@@ -219,7 +140,6 @@ function GalleriaEditor({ value, onChange }: { value: string; onChange: (v: stri
 function FieldEditor({ fieldKey, meta, onChange }: { fieldKey: string; meta: FieldMeta; onChange: (v: string) => void }) {
   if (fieldKey === 'lista_eventi') return <EventiEditor value={meta.value ?? ''} onChange={onChange} />;
   if (fieldKey === 'gallery_items') return <GalleriaEditor value={meta.value ?? ''} onChange={onChange} />;
-  if (meta.content_type === 'image') return <ImageUploadField value={meta.value ?? ''} onChange={onChange} />;
   if (meta.content_type === 'textarea') {
     return <Textarea defaultValue={meta.value ?? ''} onBlur={e => onChange(e.target.value)} rows={4} className="bg-zinc-800 border-zinc-700 text-white resize-none" />;
   }
@@ -274,7 +194,7 @@ export function ContentPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-primary uppercase tracking-widest">Contenuti Sito</h1>
           <p className="text-muted-foreground text-sm mt-1">Modifica i testi e i contenuti del sito pubblico</p>
@@ -290,7 +210,7 @@ export function ContentPage() {
 
       {status === 'ok' && (
         <div className="flex items-center gap-2 text-green-400 bg-green-400/10 border border-green-400/30 px-4 py-2 rounded">
-          <CheckCircle size={16} /> Contenuto aggiornato con successo — visibile subito sul sito
+          <CheckCircle size={16} /> Contenuto aggiornato con successo
         </div>
       )}
       {status === 'error' && (

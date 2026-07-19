@@ -105,26 +105,24 @@ export function PrivacyPolicy() {
             <p className="mb-3">Questo sito utilizza esclusivamente <strong className="text-gray-300">cookie tecnici</strong>, necessari al corretto funzionamento delle pagine. Non vengono installati cookie di profilazione o di tracciamento.</p>
             <div className="mt-3 border border-[#e6332a]/10 p-4 bg-black/30">
               <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Cookie utilizzati</p>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-gray-500 border-b border-zinc-800">
-                      <th className="text-left py-1">Nome</th>
-                      <th className="text-left py-1">Tipo</th>
-                      <th className="text-left py-1">Durata</th>
-                      <th className="text-left py-1">Scopo</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-gray-600">
-                    <tr className="border-b border-zinc-900">
-                      <td className="py-1">ekidna_cookie_consent</td>
-                      <td className="py-1">Tecnico</td>
-                      <td className="py-1">1 anno</td>
-                      <td className="py-1">Memorizza la scelta sul banner cookie</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-gray-500 border-b border-zinc-800">
+                    <th className="text-left py-1">Nome</th>
+                    <th className="text-left py-1">Tipo</th>
+                    <th className="text-left py-1">Durata</th>
+                    <th className="text-left py-1">Scopo</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-600">
+                  <tr className="border-b border-zinc-900">
+                    <td className="py-1">ekidna_cookie_consent</td>
+                    <td className="py-1">Tecnico</td>
+                    <td className="py-1">1 anno</td>
+                    <td className="py-1">Memorizza la scelta sul banner cookie</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </section>
 

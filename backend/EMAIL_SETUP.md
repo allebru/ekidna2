@@ -30,14 +30,14 @@ Before you can send emails, you need to verify your sender email address or doma
 #### Option A: Verify a Single Email Address
 1. Go to **Senders & IP** → **Senders**
 2. Click **Add a sender**
-3. Enter your email address (es. `noreply@ekidnacarpi.it`)
+3. Enter your email address (e.g., `noreply@ekidna.org`)
 4. Check your inbox for the verification email
 5. Click the verification link
 
 #### Option B: Verify Your Entire Domain (Recommended)
 1. Go to **Senders & IP** → **Domains**
 2. Click **Add a domain**
-3. Enter your domain (es. `ekidnacarpi.it`)
+3. Enter your domain (e.g., `ekidna.org`)
 4. Add the required DNS records to your domain's DNS settings
 5. Wait for verification (can take up to 72 hours)
 
@@ -86,7 +86,7 @@ EMAIL_HOST=smtp-relay.brevo.com
 EMAIL_PORT=587
 EMAIL_USER=your-brevo-account-email@example.com
 EMAIL_PASSWORD=xsmtpsib-your-long-smtp-key-here
-EMAIL_FROM=noreply@ekidnacarpi.it
+EMAIL_FROM=noreply@ekidna.org
 ```
 
 **Replace:**
@@ -103,7 +103,7 @@ EMAIL_HOST=smtp-relay.brevo.com
 EMAIL_PORT=587
 EMAIL_USER=alessandro@bruxstudio.it
 EMAIL_PASSWORD=xsmtpsib-df99787c74a234706134c2b760082e51ce2f9e1ceedc35244cd67dad840540d1-DB2pGEkd4xafo5ks
-EMAIL_FROM=noreply@ekidnacarpi.it
+EMAIL_FROM=noreply@ekidna.org
 ```
 
 ⚠️ **Security Note**: Never commit your `.env` file to git! It should be in `.gitignore`.
@@ -130,7 +130,7 @@ SMTP CONNECTION TEST
   Port: 587
   User: your-email@example.com
   Pass: xsmtpsib-...
-  From: noreply@ekidnacarpi.it
+  From: noreply@ekidna.org
 
 🔍 Testing SMTP connection...
 
@@ -148,11 +148,11 @@ The script will provide detailed troubleshooting steps based on the error.
 
 After updating your `.env` file:
 
-1. Stop the current server (Ctrl+C, or restart the app from Hostinger's hPanel in production)
-2. Restart it:
+1. Stop the current server (Ctrl+C)
+2. Restart using Docker:
    ```bash
-   cd backend
-   npm run dev    # or: npm start
+   docker compose down
+   docker compose up --build
    ```
 
 3. Check the logs for:

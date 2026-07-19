@@ -34,11 +34,8 @@ const upload = multer({
 router.post('/', authenticateToken, upload.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Nessun file ricevuto' });
 
-  // URL relativo, non assoluto: sito, admin e /uploads sono sempre servite
-  // dallo stesso dominio (vedi server.js), quindi non c'è bisogno di conoscere
-  // host/protocollo — e funziona identico in locale e in produzione senza
-  // nessuna variabile d'ambiente da configurare.
-  const url = `/uploads/${req.file.filename}`;
+  const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 3001}`;
+  const url = `${baseUrl}/uploads/${req.file.filename}`;
   res.json({ success: true, url, filename: req.file.filename });
 });
 

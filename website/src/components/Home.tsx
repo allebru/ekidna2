@@ -10,11 +10,8 @@ export function Home() {
       <section className="relative h-[80vh] md:h-[90vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={c.hero_immagine || '/img/home-hero.jpg'}
+            src="/img/home-hero.jpg"
             alt="Concerto underground all'Associazione Ekidna"
-            width={1920}
-            height={1080}
-            fetchpriority="high"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/70 to-black"></div>
@@ -52,12 +49,9 @@ export function Home() {
       <section className="relative py-20 md:py-32 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={c.cta_immagine || '/img/tesseramento-bg.jpg'}
+            src="/img/tesseramento-bg.jpg"
             alt=""
             aria-hidden="true"
-            width={1920}
-            height={1080}
-            loading="lazy"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}></div>

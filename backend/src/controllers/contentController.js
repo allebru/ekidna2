@@ -1,5 +1,4 @@
 const SiteContent = require('../models/SiteContent');
-const ssrCache = require('../services/ssrCache');
 
 // GET /api/content — all pages (public, used by website)
 exports.getAll = async (req, res, next) => {
@@ -35,7 +34,6 @@ exports.updatePage = async (req, res, next) => {
     }
     await SiteContent.updatePage(page, req.body);
     const updated = await SiteContent.getPage(page);
-    ssrCache.invalidateAll();
     res.json({ success: true, data: updated });
   } catch (err) {
     next(err);

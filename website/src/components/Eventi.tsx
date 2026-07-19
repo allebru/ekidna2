@@ -1,13 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
-import { useSiteContent } from '../context/SiteContentContext';
 
-export type EventItem = {
+type EventItem = {
   id: number;
-  slug: string;
   title: string;
-  date?: string;
-  endDate?: string;
   dateLabel: string;
   genre: string;
   image: string;
@@ -17,19 +13,51 @@ export type EventItem = {
   link?: string;
 };
 
-export function parseEvents(raw: string | undefined): EventItem[] {
-  if (!raw) return [];
-  try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
 export function Eventi() {
-  const c = useSiteContent('eventi');
-  const events = parseEvents(c.lista_eventi);
+  const events: EventItem[] = [
+    {
+      id: 1,
+      title: 'Rottura del Silenzio — Ed. 27',
+      dateLabel: '25 – 28 Giugno 2026',
+      genre: 'Festival',
+      image: '/img/eventi/rottura-del-silenzio-27.jpg',
+      description:
+        '27 anni di rumore, indipendenza e voglia di stare insieme. Rottura del Silenzio torna nel giardino di Associazione Ekidna: quattro giorni di concerti, zone distro, proiezioni e installazioni.',
+      lineup: [
+        'GIO 25/06 (free entry) — Warm Up: docufilm “Uzeda – Do It Yourself” di Maria Arena',
+        'VEN 26/06 — Sick Tamburo · Tense-Up · Adriana',
+        'SAB 27/06 — Kaos & Egreen · Cigno · Browbeat · Give Vent · H-Strychnine · Nube · 4Tracks',
+        'DOM 28/06 — Uzeda · Three Second Kiss · The Jackson Pollock · Bruuno · Fosca · To Die On Ice · Requiem for Paola P.',
+      ],
+      info: [
+        'Dove: Via Livorno 9, Carpi (MO) — Associazione Ekidna',
+        'Ingresso: 15€ al giorno (giovedì gratuito)',
+        'Biglietti disponibili solo in cassa (no prevendite online)',
+        'Cena, food & drinks, stage esterno e zona distro per tutta la durata del festival',
+      ],
+      link: 'https://www.facebook.com/events/1001945245623495',
+    },
+    {
+      id: 2,
+      title: 'The End of Impact Fest',
+      dateLabel: '10 – 12 Luglio 2026',
+      genre: 'Festival',
+      image: '/img/eventi/end-of-impact-fest.jpg',
+      description:
+        "L'ultima edizione di Impact Fest. Tre giorni, due palchi, distro & zine area, talk & market, free camping, vegan food, zones of silence, awareness team e workshop. See you at Associazione Ekidna.",
+      lineup: [
+        'VEN 10/07 — Emma Goldman · L’Idylle · Put Pùrana · Older Friends · Ineptitude · Uragano · Casamatta · Ghostboycoma',
+        'SAB 11/07 — Ostraca · Kokeshi · Powerplant · Vibora · Shizune · Oakhands · Calathea · Shooting Daggers · Cady · Emes · Plastic Bags For Helmets · Dagerman · Kadreka · Foscø · Laurie Bird · Nubifragio · Ghostboycoma',
+        'DOM 12/07 — Moshimoshi · Nivra · Verogna · Falesia · Hatsu No Hado · Marcovaldo · Nirano · Legni Vecchi · Vote For Pedro · Flâneur · Yarostan · Lumière',
+      ],
+      info: [
+        'Dove: Via Livorno 9, Carpi (MO) — Associazione Ekidna',
+        '2 live stages / distro & zine area / talk & market / free camping / vegan food',
+        'Full pass ticket disponibile online',
+      ],
+      link: 'https://www.facebook.com/events/1346447074184921',
+    },
+  ];
 
   return (
     <div className="min-h-screen pt-24 md:pt-32 pb-12">
@@ -49,17 +77,13 @@ export function Eventi() {
         {events.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {events.map((event) => (
-              <Link
+              <div
                 key={event.id}
-                to={`/eventi/${event.slug}`}
-                className="block bg-zinc-950 border border-[#e6332a]/30 hover:border-[#e6332a] hover:shadow-xl transition-all overflow-hidden"
+                className="bg-zinc-950 border border-[#e6332a]/30 hover:border-[#e6332a] hover:shadow-xl transition-all overflow-hidden"
               >
                 <img
                   src={event.image}
                   alt={`Locandina ${event.title}`}
-                  loading="lazy"
-                  width={1080}
-                  height={1350}
                   className="w-full h-auto"
                 />
                 <div className="p-8">
@@ -81,11 +105,35 @@ export function Eventi() {
                     {event.description}
                   </p>
 
-                  <span className="text-[#e6332a] text-sm uppercase tracking-[0.15em] underline">
-                    Dettagli evento →
-                  </span>
+                  {event.lineup && (
+                    <div className="mb-6 space-y-2">
+                      {event.lineup.map((line, i) => (
+                        <p key={i} className="text-gray-400 text-sm leading-relaxed">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {event.info && (
+                    <div className="mb-6 space-y-2 border-t border-[#e6332a]/20 pt-8">
+                      {event.info.map((line, i) => (
+                        <p key={i} className="text-gray-500 text-sm leading-relaxed">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {event.link && (
+                    <a href={event.link} target="_blank" rel="noopener noreferrer">
+                      <Button className="bg-[#e6332a] hover:bg-[#c41e17] text-black border border-[#e6332a] px-10 py-6 uppercase tracking-[0.15em] shadow-lg">
+                        Info evento
+                      </Button>
+                    </a>
+                  )}
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         ) : (
