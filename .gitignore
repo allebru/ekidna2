@@ -1,4 +1,5 @@
-# Environment variables
+# Environment variables (never commit real secrets)
+.env
 .env.local
 .env.*.local
 
@@ -16,12 +17,26 @@ Thumbs.db
 # Docker volumes
 postgres_data/
 
+# Uploaded files (managed on server, not in git)
+backend/public/uploads/
+
+# Temp files
+backend/tmp/
+
+# Tessera assets: ora committati (servono al backend per generare il PDF tessera).
+# Font BethEllen (OFL) + template PDF dell'associazione.
+
+# Build output
+# I frontend sono compilati in backend/public/{site,admin} e COMMITTATI:
+# il deploy del solo backend (Express) li serve come statici sullo stesso dominio
+# (sito pubblico alla root, MVP sotto /admin). backend/public/uploads resta ignorato.
+
+# Lock files (generated)
+package-lock.json
+
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# Test output files
-backend/test_tessera_output*.pdf

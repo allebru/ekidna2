@@ -1,13 +1,15 @@
 const Subscriber = require('../models/Subscriber');
 const ActivityLog = require('../models/ActivityLog');
 const emailService = require('../services/emailService');
-const pdfService = require('../services/pdfService');
 
 class SubscriberController {
   // Create new subscriber (from website form)
   static async create(req, res, next) {
     try {
-      const { name, email, phone, address, subscription_year, notes } = req.body;
+      const {
+        name, first_name, last_name, email, phone, birth_date, birth_place,
+        address, city, province, postal_code, subscription_year, notes,
+      } = req.body;
 
       // Check if email already exists (if provided)
       if (email) {
@@ -22,94 +24,16 @@ class SubscriberController {
 
       // Create subscriber
       const subscriber = await Subscriber.create({
-        name,
-        email,
-        phone,
-        address,
-        subscription_year,
-        notes
+        name, first_name, last_name,
+        email, phone, birth_date, birth_place,
+        address, city, province, postal_code,
+        subscription_year, notes,
       });
 
-      // Send confirmation email with membership card (async, don't wait)
+      // Send confirmation email (async, don't wait)
       if (email) {
-        // Generate membership card PDF and send with email
-        (async () => {
-          try {
-            console.log('🎫 Generating membership card for:', subscriber.name);
-            console.log('   - Serial Number:', subscriber.serial_number);
-            console.log('   - Year:', subscriber.subscription_year);
-            console.log('   - Email:', subscriber.email);
-
-            // Generate the membership card PDF
-            const membershipCardPdf = await pdfService.generateMembershipCard({
-              name: subscriber.name,
-              serialNumber: subscriber.serial_number,
-              year: subscriber.subscription_year
-            });
-
-            // Validate PDF generation
-            if (!membershipCardPdf) {
-              throw new Error('PDF generation returned null/undefined');
-            }
-            if (!Buffer.isBuffer(membershipCardPdf)) {
-              throw new Error(`PDF generation returned invalid type: ${typeof membershipCardPdf}`);
-            }
-            if (membershipCardPdf.length === 0) {
-              throw new Error('PDF generation returned empty buffer');
-            }
-
-            console.log('✅ Membership card generated successfully');
-            console.log('   - PDF size:', membershipCardPdf.length, 'bytes');
-            console.log('   - PDF size (KB):', (membershipCardPdf.length / 1024).toFixed(2), 'KB');
-            console.log('   - Is Buffer:', Buffer.isBuffer(membershipCardPdf));
-
-            // Prepare attachment for email
-            const filename = `Tessera_Ekidna_${subscriber.subscription_year}_${String(subscriber.serial_number).padStart(5, '0')}.pdf`;
-            const attachments = [{
-              filename: filename,
-              content: membershipCardPdf,
-              contentType: 'application/pdf'
-            }];
-
-            console.log('📎 Prepared attachment object:', filename);
-            console.log('   - Attachments array length:', attachments.length);
-            console.log('   - Attachment[0].filename:', attachments[0].filename);
-            console.log('   - Attachment[0].content is Buffer:', Buffer.isBuffer(attachments[0].content));
-            console.log('   - Attachment[0].content.length:', attachments[0].content.length);
-            console.log('   - Attachment[0].contentType:', attachments[0].contentType);
-
-            // Validate attachments before sending
-            if (!attachments || attachments.length === 0) {
-              throw new Error('Attachments array is empty');
-            }
-            if (!attachments[0].content || !Buffer.isBuffer(attachments[0].content)) {
-              throw new Error('Attachment content is invalid');
-            }
-
-            // Send confirmation email with attachment
-            console.log('📧 About to send confirmation email...');
-            console.log('   - To:', subscriber.email);
-            console.log('   - With attachments:', attachments.length, 'file(s)');
-            console.log('   - Calling: emailService.sendSubscriptionConfirmation()');
-
-            const result = await emailService.sendSubscriptionConfirmation(subscriber, attachments);
-
-            if (result.success) {
-              console.log('✅ Confirmation email sent with membership card');
-              console.log('   - Message ID:', result.messageId);
-            } else {
-              console.error('❌ Failed to send confirmation email:', result.message);
-            }
-          } catch (err) {
-            console.error('❌ Failed to generate/send membership card:', err);
-            console.error('   - Error message:', err.message);
-            console.error('   - Error stack:', err.stack);
-          }
-        })();
-
-        // Send notification to staff (async)
-        emailService.sendStaffNotification(subscriber).catch(err => {
-          console.error('Failed to send staff notification:', err);
+        emailService.sendSubscriptionConfirmation(subscriber).catch(err => {
+          console.error('Failed to send confirmation email:', err);
         });
       }
 
@@ -120,8 +44,7 @@ class SubscriberController {
           id: subscriber.id,
           name: subscriber.name,
           email: subscriber.email,
-          subscription_year: subscriber.subscription_year,
-          serial_number: subscriber.serial_number
+          subscription_year: subscriber.subscription_year
         }
       });
     } catch (error) {

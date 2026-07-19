@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
+const path = require('path');
 const pool = require('./config/database');
 const emailService = require('./services/emailService');
 const routes = require('./routes');
@@ -15,12 +16,38 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Security middleware
-app.use(helmet());
+// Dietro il reverse-proxy di Hostinger: fidati del primo proxy per ottenere
+// l'IP reale del client (necessario al rate-limit per non contare tutti insieme).
+app.set('trust proxy', 1);
 
-// CORS configuration
+// Security middleware
+// CSP su misura: i frontend serviti da Express usano asset same-origin,
+// Google Fonts (Space Grotesk) e stili inline (Tailwind/React).
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'"],
+    },
+  },
+}));
+
+// CORS configuration — i frontend sono serviti dallo stesso backend (same-origin),
+// quindi la CORS serve solo a eventuali client cross-origin. Per le origini non in
+// allowlist NON si blocca la richiesta (si omettono solo gli header CORS): così il
+// sito si carica anche dal dominio temporaneo Hostinger e l'health check non fallisce.
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // same-origin / curl
+    const isLocalhost = /^https?:\/\/localhost(:\d+)?$/.test(origin);
+    const allowed = [process.env.FRONTEND_URL, process.env.BACKEND_URL].filter(Boolean);
+    if (isLocalhost || allowed.includes(origin)) return callback(null, true);
+    return callback(null, false); // origine non consentita: niente header CORS, ma non errore
+  },
   credentials: true
 }));
 
@@ -37,10 +64,55 @@ app.use((req, res, next) => {
   next();
 });
 
+// Serve uploaded files as static
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+
 // API routes
 app.use('/api', routes);
 
-// 404 handler
+// ---- Static frontends (produzione): un solo dominio per sito + MVP ----
+const websiteDir = path.join(__dirname, '../public/site');
+const mvpDir = path.join(__dirname, '../public/admin');
+const ssr = require('./services/ssr');
+
+// App gestionale (MVP) sotto /admin
+app.use('/admin', express.static(mvpDir));
+app.get('/admin/*', (req, res) => res.sendFile(path.join(mvpDir, 'index.html')));
+
+// Sitemap generata dinamicamente dalle rotte note + eventi realmente presenti
+// (registrata prima dello static middleware così vince sempre lei).
+app.get('/sitemap.xml', async (req, res, next) => {
+  try {
+    const routes = await ssr.listKnownRoutes();
+    const baseUrl = process.env.SITE_URL || 'https://ekidnacarpi.it';
+    const urls = routes
+      .map((route) => `  <url><loc>${baseUrl}${route}</loc></url>`)
+      .join('\n');
+    res.type('application/xml').send(
+      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`
+    );
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Asset compilati del sito pubblico (JS/CSS/immagini). `index: false` perché
+// l'HTML delle pagine non è più un file statico: viene renderizzato on-demand
+// da ssr.renderPage() con i meta/contenuti correnti dal CMS.
+app.use(express.static(websiteDir, { index: false }));
+
+// Pagine del sito pubblico: SSR on-demand (con cache) per tutto ciò che NON è
+// /api o /uploads. Rotte inesistenti ricevono un vero 404 (niente soft-404).
+app.get(/^(?!\/(?:api|uploads)\/).*/, async (req, res, next) => {
+  try {
+    const { status, html } = await ssr.renderPage(req.path);
+    res.status(status).send(html);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 404 handler (raggiunto solo da /api/* e /uploads/* non trovati)
 app.use(notFoundHandler);
 
 // Error handler
@@ -49,14 +121,11 @@ app.use(errorHandler);
 // Database connection test
 async function testDatabaseConnection() {
   try {
-    const client = await pool.connect();
+    const connection = await pool.getConnection();
+    const [rows] = await connection.query('SELECT NOW() AS now');
     console.log('✓ Database connected successfully');
-
-    // Test query
-    const result = await client.query('SELECT NOW()');
-    console.log('✓ Database query test successful:', result.rows[0].now);
-
-    client.release();
+    console.log('✓ Database query test successful:', rows[0].now);
+    connection.release();
     return true;
   } catch (error) {
     console.error('✗ Database connection failed:', error.message);
@@ -78,7 +147,7 @@ async function initializeEmailService() {
 function gracefulShutdown() {
   console.log('\nShutting down gracefully...');
 
-  pool.end(() => {
+  pool.end().then(() => {
     console.log('✓ Database pool closed');
     process.exit(0);
   });
@@ -104,6 +173,18 @@ async function startServer() {
     if (!dbConnected) {
       console.error('✗ Cannot start server without database connection');
       process.exit(1);
+    }
+
+    // Migrazione automatica (opzionale): se AUTO_MIGRATE=true crea tabelle,
+    // utente admin e contenuti di default all'avvio. Operazione idempotente.
+    if (process.env.AUTO_MIGRATE === 'true') {
+      try {
+        console.log('⏳ AUTO_MIGRATE attivo: eseguo le migrazioni...');
+        await require('../migrations/run')();
+        console.log('✓ Migrazioni completate\n');
+      } catch (err) {
+        console.error('✗ Migrazioni fallite (l\'app parte comunque):', err.message);
+      }
     }
 
     // Initialize email service (non-blocking)

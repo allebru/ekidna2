@@ -1,45 +1,23 @@
-const { createTransporter, emailTemplates: smtpEmailTemplates } = require('../config/email');
-const { BrevoEmailClient, emailTemplates } = require('../config/email-api');
+const { createTransporter, emailTemplates } = require('../config/email');
 const pool = require('../config/database');
 
 class EmailService {
   constructor() {
     this.transporter = null;
-    this.useHttpApi = false;
-    this.brevoClient = null;
   }
 
   async initialize() {
     try {
       console.log('🔧 Initializing email service...');
 
-      // Prefer Brevo HTTP API if available (works better in proxy environments)
-      if (process.env.BREVO_API_KEY) {
-        console.log('📧 Found BREVO_API_KEY - using HTTP API');
-        this.brevoClient = new BrevoEmailClient();
-
-        try {
-          await this.brevoClient.verify();
-          this.useHttpApi = true;
-          console.log('✅ Email service initialized successfully (HTTP API)');
-          console.log('📮 Ready to send emails via Brevo HTTP API');
-          return true;
-        } catch (error) {
-          console.error('❌ Brevo HTTP API initialization failed:', error.message);
-          console.log('💡 Falling back to SMTP if available...');
-        }
-      }
-
-      // Fall back to SMTP
+      // Check if email configuration is present
       if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
         console.warn('⚠️  Email configuration incomplete - skipping email service initialization');
-        console.log('💡 To enable emails, set either:');
-        console.log('   - BREVO_API_KEY (recommended, works in proxy environments)');
-        console.log('   - EMAIL_HOST, EMAIL_USER, and EMAIL_PASSWORD (SMTP)');
+        console.log('💡 To enable emails, set EMAIL_HOST, EMAIL_USER, and EMAIL_PASSWORD in .env');
         return false;
       }
 
-      console.log('📧 Email configuration (SMTP):', {
+      console.log('📧 Email configuration:', {
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT,
         user: process.env.EMAIL_USER,
@@ -53,8 +31,7 @@ class EmailService {
       // Verify connection
       console.log('🔍 Verifying SMTP connection...');
       await this.transporter.verify();
-      this.useHttpApi = false;
-      console.log('✅ Email service initialized successfully (SMTP)');
+      console.log('✅ Email service initialized successfully');
       console.log('📮 Ready to send emails via:', process.env.EMAIL_HOST);
       return true;
     } catch (error) {
@@ -74,21 +51,13 @@ class EmailService {
         console.log('   3. Update EMAIL_PASSWORD in .env with the new key');
         console.log('   4. Run: node test-smtp.js (to test independently)');
         console.log('   5. Restart the server');
-      } else if (error.code === 'ESOCKET' || error.code === 'ECONNECTION' || error.code === 'EDNS') {
+      } else if (error.code === 'ESOCKET' || error.code === 'ECONNECTION') {
         console.log('🔧 CONNECTION ERROR - Cannot reach SMTP server!');
-        console.log('   This often happens when SMTP ports are blocked by firewall/proxy.');
-        console.log('   ');
-        console.log('   RECOMMENDED SOLUTION: Use Brevo HTTP API instead');
-        console.log('   1. Go to: https://app.brevo.com/settings/keys/api');
-        console.log('   2. Create a new API key');
-        console.log('   3. Add to .env: BREVO_API_KEY=your-api-key-here');
-        console.log('   4. Restart the server');
-        console.log('   ');
-        console.log('   HTTP API works through proxies and firewalls!');
+        console.log('   Check: EMAIL_HOST and EMAIL_PORT in .env');
+        console.log('   For Brevo: HOST=smtp-relay.brevo.com, PORT=587');
       } else if (error.code === 'ETIMEDOUT') {
         console.log('🔧 TIMEOUT ERROR - SMTP server not responding!');
         console.log('   Check your internet connection and firewall settings');
-        console.log('   Or use BREVO_API_KEY for HTTP API instead');
       }
 
       console.log();
@@ -100,35 +69,11 @@ class EmailService {
     }
   }
 
-  async sendSubscriptionConfirmation(subscriber, attachments = []) {
-    console.log('');
-    console.log('='.repeat(70));
-    console.log('📧 SENDSUBSCRIPTIONCONFIRMATION CALLED');
-    console.log('='.repeat(70));
-    console.log('📧 To:', subscriber.email);
-    console.log('📧 Subscriber name:', subscriber.name);
-    console.log('📧 Attachments parameter received:');
-    console.log('   - Is defined:', attachments !== undefined);
-    console.log('   - Is array:', Array.isArray(attachments));
-    console.log('   - Length:', attachments ? attachments.length : 'N/A');
-    if (attachments && attachments.length > 0) {
-      attachments.forEach((att, idx) => {
-        console.log(`   - Attachment[${idx}]:`, {
-          filename: att.filename,
-          hasContent: !!att.content,
-          contentIsBuffer: Buffer.isBuffer(att.content),
-          contentLength: att.content?.length || 0,
-          contentType: att.contentType
-        });
-      });
-    } else {
-      console.log('   - ⚠️  WARNING: No attachments in array!');
-    }
-    console.log('='.repeat(70));
-    console.log('');
+  async sendSubscriptionConfirmation(subscriber) {
+    console.log('📧 Attempting to send confirmation email to:', subscriber.email);
 
-    if (!this.transporter && !this.brevoClient) {
-      console.error('❌ Email service not initialized. Skipping email.');
+    if (!this.transporter) {
+      console.error('❌ Email transporter not initialized. Skipping email.');
       return { success: false, message: 'Email service not configured' };
     }
 
@@ -140,118 +85,39 @@ class EmailService {
     try {
       const template = emailTemplates.subscriptionConfirmation(subscriber);
 
-      let info;
-      if (this.useHttpApi && this.brevoClient) {
-        console.log('📤 Sending email via Brevo HTTP API...');
-        console.log('📎 Raw attachments received:', attachments.length, 'files');
-
-        if (attachments.length > 0) {
-          console.log('📎 Attachment details:', attachments.map(a => ({
-            filename: a.filename,
-            contentType: a.contentType,
-            contentLength: a.content?.length || 0,
-            isBuffer: Buffer.isBuffer(a.content)
-          })));
-        }
-
-        // Format attachments for Brevo HTTP API
-        console.log('🔄 Converting attachments for Brevo HTTP API format...');
-        const brevoAttachments = attachments.map((att, idx) => {
-          console.log(`📎 Processing attachment ${idx + 1}/${attachments.length}: ${att.filename}`);
-
-          if (!att.content || !Buffer.isBuffer(att.content)) {
-            console.error(`❌ ERROR: Attachment ${idx} has invalid content!`);
-            throw new Error(`Attachment ${att.filename} has invalid content (not a Buffer)`);
-          }
-
-          const base64Content = att.content.toString('base64');
-          const sizeInBytes = att.content.length;
-          const sizeInMB = (sizeInBytes / 1024 / 1024).toFixed(2);
-
-          console.log(`   - Original size: ${sizeInBytes} bytes (${sizeInMB} MB)`);
-          console.log(`   - Base64 size: ${base64Content.length} chars`);
-          console.log(`   - Content type: ${att.contentType || 'not specified'}`);
-
-          // Warn if attachment is close to Brevo's 2MB limit
-          if (sizeInBytes > 1.5 * 1024 * 1024) {
-            console.warn(`⚠️  WARNING: Attachment is large (${sizeInMB} MB). Brevo has a 2MB limit per attachment.`);
-          }
-
-          return {
-            name: att.filename,
-            content: base64Content
-          };
-        });
-
-        console.log('📎 Formatted Brevo attachments:', brevoAttachments.length);
-        if (brevoAttachments.length > 0) {
-          console.log('📎 Total attachments ready to send:', brevoAttachments.length);
-          brevoAttachments.forEach((att, index) => {
-            console.log(`   ${index + 1}. ${att.name} (base64: ${att.content.length} chars)`);
+      // Genera la tessera PDF e allegala (best-effort: se fallisce, manda comunque l'email)
+      const attachments = [];
+      try {
+        if (subscriber.card_number) {
+          const { generateTessera } = require('./pdfService');
+          const pdfPath = await generateTessera({
+            cardNumber: subscriber.card_number,
+            name: subscriber.name,
+            year: subscriber.subscription_year,
           });
+          attachments.push({ filename: `Tessera_Ekidna_${subscriber.card_number}.pdf`, path: pdfPath });
+          console.log('🪪 Tessera PDF generata:', pdfPath);
         }
-
-        info = await this.brevoClient.sendMail({
-          to: subscriber.email,
-          subject: template.subject,
-          text: template.text,
-          html: template.html,
-          attachments: brevoAttachments.length > 0 ? brevoAttachments : undefined
-        });
-      } else if (this.transporter) {
-        console.log('📤 Sending email via SMTP...');
-        console.log('📎 Raw attachments received:', attachments.length, 'files');
-
-        if (attachments.length > 0) {
-          console.log('📎 Attachment details:', attachments.map(a => ({
-            filename: a.filename,
-            contentType: a.contentType,
-            contentLength: a.content?.length || 0,
-            isBuffer: Buffer.isBuffer(a.content)
-          })));
-        }
-
-        // Format attachments for Nodemailer SMTP
-        const smtpAttachments = attachments.map(att => ({
-          filename: att.filename,
-          content: att.content,
-          contentType: att.contentType || 'application/pdf'
-        }));
-
-        console.log('📎 Formatted SMTP attachments:', smtpAttachments.length);
-        if (smtpAttachments.length > 0) {
-          smtpAttachments.forEach((att, index) => {
-            console.log(`   ${index + 1}. ${att.filename} (${att.content.length} bytes, ${att.contentType})`);
-          });
-        }
-
-        info = await this.transporter.sendMail({
-          from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
-          to: subscriber.email,
-          subject: template.subject,
-          text: template.text,
-          html: template.html,
-          attachments: smtpAttachments.length > 0 ? smtpAttachments : undefined
-        });
-      } else {
-        throw new Error('No email transport available');
+      } catch (pdfErr) {
+        console.warn('⚠️  Tessera PDF non generata (email inviata senza allegato):', pdfErr.message);
       }
+
+      console.log('📤 Sending email via SMTP...');
+      const info = await this.transporter.sendMail({
+        from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
+        to: subscriber.email,
+        subject: template.subject,
+        text: template.text,
+        html: template.html,
+        attachments,
+      });
 
       console.log('✅ Confirmation email sent successfully!');
       console.log('📬 Message ID:', info.messageId);
       console.log('👤 Sent to:', subscriber.email);
-      if (attachments.length > 0) {
-        console.log('📎 Attachments:', attachments.map(a => a.filename).join(', '));
-      }
 
-      // Update database to mark email as sent
-      await pool.query(
-        `UPDATE subscribers
-         SET email_confirmed = true,
-             email_confirmation_sent_at = CURRENT_TIMESTAMP
-         WHERE id = $1`,
-        [subscriber.id]
-      );
+      // Segna l'email come inviata (MySQL: colonna email_sent)
+      await pool.query('UPDATE subscribers SET email_sent = 1 WHERE id = ?', [subscriber.id]);
 
       console.log('✅ Database updated - email confirmed');
 
@@ -272,45 +138,33 @@ class EmailService {
   }
 
   async sendStaffNotification(subscriber) {
-    if (!this.transporter && !this.brevoClient) {
-      console.warn('Email service not initialized. Skipping staff notification.');
+    if (!this.transporter) {
+      console.warn('Email transporter not initialized. Skipping staff notification.');
       return { success: false, message: 'Email service not configured' };
     }
 
     try {
-      // Get admin/staff emails
-      const result = await pool.query(
-        'SELECT email FROM staff_users WHERE is_active = true AND role IN ($1, $2)',
+      // Get admin/staff emails (MySQL: ? placeholders, [rows] destructuring)
+      const [rows] = await pool.query(
+        'SELECT email FROM staff_users WHERE is_active = 1 AND role IN (?, ?)',
         ['admin', 'staff']
       );
 
-      if (result.rows.length === 0) {
+      if (!rows || rows.length === 0) {
         console.warn('No staff emails found for notification');
         return { success: false, message: 'No staff emails configured' };
       }
 
-      const staffEmails = result.rows.map(row => row.email);
+      const staffEmails = rows.map(row => row.email);
       const template = emailTemplates.staffNotification(subscriber);
 
-      let info;
-      if (this.useHttpApi && this.brevoClient) {
-        info = await this.brevoClient.sendMail({
-          to: staffEmails.join(','),
-          subject: template.subject,
-          text: template.text,
-          html: template.html
-        });
-      } else if (this.transporter) {
-        info = await this.transporter.sendMail({
-          from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
-          to: staffEmails.join(','),
-          subject: template.subject,
-          text: template.text,
-          html: template.html
-        });
-      } else {
-        throw new Error('No email transport available');
-      }
+      const info = await this.transporter.sendMail({
+        from: process.env.EMAIL_FROM || 'noreply@ekidna.org',
+        to: staffEmails.join(','),
+        subject: template.subject,
+        text: template.text,
+        html: template.html
+      });
 
       console.log('Staff notification email sent:', info.messageId);
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Loader2, Database, Users, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
-import { projectId } from '../utils/supabase/info';
+import { subscribersAPI } from '../config/api';
 import { SubscriberStats } from '../components/subscribers/SubscriberStats';
 import { SubscribersFilters } from '../components/subscribers/SubscribersFilters';
 import { SubscribersTable } from '../components/subscribers/SubscribersTable';
@@ -36,7 +36,6 @@ export function SubscribersPage({ accessToken }: SubscribersPageProps) {
   const [itemsPerPage] = useState(25);
   const [editingSubscriber, setEditingSubscriber] = useState<Subscriber | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [seeding, setSeeding] = useState(false);
 
   useEffect(() => {
     fetchSubscribers();
@@ -49,21 +48,8 @@ export function SubscribersPage({ accessToken }: SubscribersPageProps) {
 
   const fetchSubscribers = async () => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cd70e814/subscribers`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch subscribers');
-      }
-
-      const data = await response.json();
-      setSubscribers(data.subscribers || []);
+      const data = await subscribersAPI.getAll({ status: 'all', limit: 500 });
+      setSubscribers(data.data || []);
     } catch (error) {
       console.error('Error fetching subscribers:', error);
     } finally {
@@ -74,26 +60,23 @@ export function SubscribersPage({ accessToken }: SubscribersPageProps) {
   const filterSubscribers = () => {
     let filtered = [...subscribers];
 
-    // Status filter
     if (statusFilter === 'active') {
       filtered = filtered.filter(s => s.status === 'active');
     } else if (statusFilter === 'deleted') {
       filtered = filtered.filter(s => s.status === 'deleted');
     }
 
-    // Year filter
     if (yearFilter !== 'all') {
       filtered = filtered.filter(s => s.subscription_year === Number(yearFilter));
     }
 
-    // Search filter
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       filtered = filtered.filter(s =>
-        s.name.toLowerCase().includes(search) ||
-        s.email.toLowerCase().includes(search) ||
-        s.phone.includes(search) ||
-        s.address.toLowerCase().includes(search)
+        s.name?.toLowerCase().includes(search) ||
+        s.email?.toLowerCase().includes(search) ||
+        s.phone?.includes(search) ||
+        s.address?.toLowerCase().includes(search)
       );
     }
 
@@ -101,113 +84,26 @@ export function SubscribersPage({ accessToken }: SubscribersPageProps) {
   };
 
   const handleAddSubscriber = async (newSubscriber: Omit<Subscriber, 'id' | 'status' | 'created_at' | 'updated_at'>) => {
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cd70e814/subscribers`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newSubscriber),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to add subscriber');
-      }
-
-      const data = await response.json();
-      setSubscribers([...subscribers, data.subscriber]);
-    } catch (error) {
-      console.error('Error adding subscriber:', error);
-      throw error;
-    }
+    const data = await subscribersAPI.create(newSubscriber);
+    setSubscribers(prev => [...prev, data.subscriber || data]);
   };
 
   const handleUpdateSubscriber = async (id: string, updates: Partial<Subscriber>) => {
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cd70e814/subscribers/${id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updates),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to update subscriber');
-      }
-
-      const data = await response.json();
-      setSubscribers(subscribers.map(s => s.id === id ? data.subscriber : s));
-    } catch (error) {
-      console.error('Error updating subscriber:', error);
-      throw error;
-    }
+    const data = await subscribersAPI.update(id, updates);
+    setSubscribers(prev => prev.map(s => s.id === id ? (data.subscriber || data) : s));
   };
 
   const handleDeleteSubscriber = async () => {
     if (!deletingId) return;
-
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cd70e814/subscribers/${deletingId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to delete subscriber');
-      }
-
-      const data = await response.json();
-      setSubscribers(subscribers.map(s => s.id === deletingId ? data.subscriber : s));
-      setDeletingId(null);
-    } catch (error) {
-      console.error('Error deleting subscriber:', error);
-    }
-  };
-
-  const handleSeedData = async () => {
-    setSeeding(true);
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cd70e814/seed`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to seed data');
-      }
-
-      await fetchSubscribers();
-    } catch (error) {
-      console.error('Error seeding data:', error);
-    } finally {
-      setSeeding(false);
-    }
+    const data = await subscribersAPI.delete(deletingId);
+    setSubscribers(prev => prev.map(s => s.id === deletingId ? (data.subscriber || { ...s, status: 'deleted' }) : s));
+    setDeletingId(null);
   };
 
   const availableYears = Array.from(
     new Set(subscribers.map(s => s.subscription_year))
   ).sort((a, b) => b - a);
 
-  // Pagination
   const totalPages = Math.ceil(filteredSubscribers.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -215,41 +111,21 @@ export function SubscribersPage({ accessToken }: SubscribersPageProps) {
 
   return (
     <div className="space-y-6">
-      {/* Seed Button (for testing) */}
       {subscribers.length === 0 && !loading && (
         <Card className="border-2 border-primary/30 bg-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-primary mb-1">Nessun dato presente</p>
-                <p className="text-sm text-muted-foreground">Carica dati di esempio per testare il sistema</p>
+                <p className="text-sm text-muted-foreground">Aggiungi il primo iscritto con il pulsante "Aggiungi"</p>
               </div>
-              <Button
-                onClick={handleSeedData}
-                disabled={seeding}
-                className="bg-primary text-black hover:bg-primary/90"
-              >
-                {seeding ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Caricamento...
-                  </>
-                ) : (
-                  <>
-                    <Database className="h-4 w-4 mr-2" />
-                    Carica Dati Test
-                  </>
-                )}
-              </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Stats */}
       <SubscriberStats subscribers={subscribers} />
 
-      {/* Filters */}
       <Card className="border-2 border-primary/30 bg-card">
         <CardHeader>
           <CardTitle className="text-primary flex items-center gap-2">
@@ -271,7 +147,6 @@ export function SubscribersPage({ accessToken }: SubscribersPageProps) {
         </CardContent>
       </Card>
 
-      {/* Subscribers Table */}
       <Card className="border-2 border-primary/30 bg-card">
         <CardHeader className="pb-3">
           <CardTitle className="text-primary flex items-center justify-between">
@@ -304,7 +179,6 @@ export function SubscribersPage({ accessToken }: SubscribersPageProps) {
                 onDelete={setDeletingId}
               />
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-between px-4 py-3 border-t border-primary/20">
                   <div className="text-sm text-muted-foreground">
@@ -316,19 +190,17 @@ export function SubscribersPage({ accessToken }: SubscribersPageProps) {
                       variant="outline"
                       onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                       disabled={currentPage === 1}
-                      className="border-primary text-primary hover:bg-primary hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="border-primary text-primary hover:bg-primary hover:text-black disabled:opacity-50"
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <span className="text-sm text-foreground">
-                      {currentPage} / {totalPages}
-                    </span>
+                    <span className="text-sm text-foreground">{currentPage} / {totalPages}</span>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                       disabled={currentPage === totalPages}
-                      className="border-primary text-primary hover:bg-primary hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="border-primary text-primary hover:bg-primary hover:text-black disabled:opacity-50"
                     >
                       <ChevronRight className="h-4 w-4" />
                     </Button>
@@ -340,7 +212,6 @@ export function SubscribersPage({ accessToken }: SubscribersPageProps) {
         </CardContent>
       </Card>
 
-      {/* Edit Dialog */}
       <EditSubscriberDialog
         subscriber={editingSubscriber}
         open={!!editingSubscriber}
@@ -348,7 +219,6 @@ export function SubscribersPage({ accessToken }: SubscribersPageProps) {
         onSave={handleUpdateSubscriber}
       />
 
-      {/* Delete Confirmation Dialog */}
       <DeleteConfirmDialog
         open={!!deletingId}
         onOpenChange={(open) => !open && setDeletingId(null)}

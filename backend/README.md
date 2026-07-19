@@ -1,371 +1,121 @@
-# Ekidna Backend API
+# Ekidna Backend
 
-Backend server for Ekidna APS subscription management system.
+API Express + rendering server-side del sito pubblico, per Ekidna APS.
 
-## Features
+## Stack
 
-- **RESTful API** with Express.js
-- **PostgreSQL Database** with Docker
-- **JWT Authentication** for staff users
-- **Email Notifications** (Nodemailer)
-- **Soft Delete** support for subscribers
-- **Activity Logging** for audit trail
-- **CORS** enabled for frontend integration
-- **Validation** with express-validator
-- **Security** with Helmet.js
+- **Node.js** + **Express 4**
+- **MySQL** (`mysql2`) — nessun ORM, query dirette nei model
+- **JWT** (`jsonwebtoken` + `bcryptjs`) per l'autenticazione staff
+- **Nodemailer** per le email di conferma tesseramento (via Brevo SMTP, vedi [EMAIL_SETUP.md](./EMAIL_SETUP.md))
+- **pdf-lib** per generare il PDF della tessera associativa
+- **multer** per l'upload immagini dal CMS
+- **helmet**, **express-rate-limit**, **express-validator** per la sicurezza
 
-## Tech Stack
+Non serve Docker per eseguire il backend: è un processo Node singolo che si connette a un MySQL già esistente (locale o remoto).
 
-- **Node.js** 20.x
-- **Express.js** 4.x
-- **PostgreSQL** 16
-- **Docker & Docker Compose**
-- **Nodemailer** for emails
-- **JWT** for authentication
-- **bcryptjs** for password hashing
-
-## Project Structure
+## Struttura
 
 ```
 backend/
 ├── src/
-│   ├── config/          # Configuration files (DB, email, JWT)
-│   ├── controllers/     # Request handlers
-│   ├── models/          # Database models
-│   ├── routes/          # API routes
-│   ├── middleware/      # Auth, validation, error handling
-│   ├── services/        # Business logic (email service)
-│   ├── utils/           # Helper functions
-│   └── server.js        # Entry point
-├── migrations/          # Database schema
-├── Dockerfile           # Docker configuration
-└── package.json         # Dependencies
+│   ├── config/          # connessione MySQL, JWT, email
+│   ├── controllers/     # logica delle route (auth, content, seo, subscribers, upload)
+│   ├── models/          # StaffUser, Subscriber, ActivityLog, SiteContent, PageSeo
+│   ├── routes/          # definizione endpoint, montati in routes/index.js
+│   ├── middleware/       # auth JWT, validazione input, error handler
+│   ├── services/        # ssr.js (rendering pagine pubbliche), ssrCache.js, emailService, pdfService
+│   ├── ssr/              # bundle SSR generato da `website/` — non editare a mano, si rigenera con `npm run build` in website/
+│   └── server.js        # entry point Express
+├── migrations/
+│   ├── init.sql          # schema base (staff_users, subscribers, activity_logs)
+│   ├── site_content.sql  # tabella contenuti CMS
+│   ├── cms_extensions.sql # tabella page_seo + tipo campo "image"
+│   └── run.js            # esegue tutte le migrazioni + seed di default (idempotente)
+├── public/
+│   ├── site/     # build del sito pubblico (website/), committata in git
+│   ├── admin/    # build dell'admin (MVP/), committata in git
+│   └── uploads/  # immagini caricate dal CMS, NON in git
+└── package.json
 ```
 
-## Quick Start (Local Development)
+## Avvio in locale
 
-### Prerequisites
-
-- Node.js 20+ installed
-- Docker and Docker Compose installed
-- Gmail account (or SMTP server) for email functionality
-
-### 1. Clone and Setup
-
-```bash
-cd ekidna2/backend
-npm install
-```
-
-### 2. Configure Environment
-
-Create `.env` file in the project root (see `.env.example`):
-
-```bash
-# Copy from root directory
-cp ../.env.example ../.env
-```
-
-Edit `.env` with your settings:
+Richiede un MySQL raggiungibile e un file `.env` **nella root del repository** (non in `backend/` — sia `server.js` che `migrations/run.js` lo leggono da lì). Variabili minime:
 
 ```env
-# Database
+DB_HOST=127.0.0.1
+DB_PORT=3306
 DB_NAME=ekidna_db
 DB_USER=ekidna_user
-DB_PASSWORD=your_secure_password
-
-# JWT
-JWT_SECRET=your-super-secret-jwt-key-change-this
-
-# Email (Gmail example)
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASSWORD=your-app-password
-EMAIL_FROM=noreply@ekidna.org
-
-# Frontend URL
-FRONTEND_URL=http://localhost:3000
+DB_PASSWORD=...
+JWT_SECRET=...
+PORT=3001
+SITE_URL=http://localhost:3001
+ADMIN_EMAIL=admin@ekidna.org
+ADMIN_PASSWORD=admin123
 ```
-
-### 3. Start with Docker
-
-From the project root:
 
 ```bash
-cd ..
-docker-compose up -d
-```
-
-This will start:
-- **PostgreSQL** database on port 5432
-- **Backend API** on port 3001
-- **Adminer** (DB admin UI) on port 8080
-
-### 4. Verify Installation
-
-Check if services are running:
-
-```bash
-docker-compose ps
-```
-
-Test the API:
-
-```bash
-curl http://localhost:3001/api/health
-```
-
-You should see:
-```json
-{
-  "status": "ok",
-  "timestamp": "2025-10-23T...",
-  "uptime": 1.234
-}
-```
-
-## API Endpoints
-
-### Public Endpoints
-
-#### `POST /api/subscribers`
-Create a new subscriber (from website form).
-
-**Request:**
-```json
-{
-  "name": "Marco Rossi",
-  "email": "marco.rossi@example.com",
-  "phone": "+39 333 1234567",
-  "address": "Via Roma 1, Milano, 20121",
-  "subscription_year": 2025
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Subscription created successfully",
-  "subscriber": {
-    "id": "uuid",
-    "name": "Marco Rossi",
-    "email": "marco.rossi@example.com",
-    "subscription_year": 2025
-  }
-}
-```
-
-### Authentication Endpoints
-
-#### `POST /api/auth/login`
-Login for staff users.
-
-**Request:**
-```json
-{
-  "email": "admin@ekidna.org",
-  "password": "admin123"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "token": "jwt-token-here",
-  "user": {
-    "id": "uuid",
-    "email": "admin@ekidna.org",
-    "name": "Administrator",
-    "role": "admin"
-  }
-}
-```
-
-#### `GET /api/auth/me`
-Get current user info (requires authentication).
-
-**Headers:**
-```
-Authorization: Bearer <token>
-```
-
-### Subscriber Management (Protected)
-
-All endpoints require authentication header:
-```
-Authorization: Bearer <token>
-```
-
-#### `GET /api/subscribers`
-Get all subscribers with pagination.
-
-**Query Parameters:**
-- `page` - Page number (default: 1)
-- `limit` - Items per page (default: 50)
-- `status` - Filter by status: active, deleted, pending
-- `subscription_year` - Filter by year
-- `search` - Search by name or email
-
-#### `GET /api/subscribers/:id`
-Get subscriber by ID.
-
-#### `PUT /api/subscribers/:id`
-Update subscriber.
-
-#### `DELETE /api/subscribers/:id`
-Soft delete subscriber.
-
-#### `POST /api/subscribers/:id/restore`
-Restore deleted subscriber.
-
-#### `GET /api/subscribers/stats`
-Get subscriber statistics.
-
-#### `GET /api/subscribers/year/:year`
-Get subscribers by year.
-
-## Default Admin User
-
-**Email:** admin@ekidna.org
-**Password:** admin123
-
-⚠️ **IMPORTANT:** Change this password immediately after first login!
-
-## Email Configuration
-
-### Using Gmail
-
-1. Enable 2-factor authentication in your Google account
-2. Generate an App Password: https://myaccount.google.com/apppasswords
-3. Use the app password in `.env`:
-
-```env
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASSWORD=your-16-digit-app-password
-```
-
-### Email Templates
-
-The system sends two types of emails:
-
-1. **Subscription Confirmation** - Sent to subscribers after registration
-2. **Staff Notification** - Sent to staff when new subscription is created
-
-Templates are in Italian and can be customized in `src/config/email.js`.
-
-## Database Management
-
-### Using Adminer (Web UI)
-
-1. Open http://localhost:8080
-2. Login with:
-   - System: PostgreSQL
-   - Server: db
-   - Username: ekidna_user (from .env)
-   - Password: your password
-   - Database: ekidna_db
-
-### Using psql (Command Line)
-
-```bash
-docker exec -it ekidna_db psql -U ekidna_user -d ekidna_db
-```
-
-### Backup Database
-
-```bash
-docker exec ekidna_db pg_dump -U ekidna_user ekidna_db > backup.sql
-```
-
-### Restore Database
-
-```bash
-docker exec -i ekidna_db psql -U ekidna_user -d ekidna_db < backup.sql
-```
-
-## Development
-
-### Run without Docker
-
-```bash
-# Start PostgreSQL separately (or use Docker for DB only)
-docker-compose up -d db
-
-# Install dependencies
 npm install
-
-# Run in development mode
-npm run dev
+npm run migrate   # crea/aggiorna schema, seed contenuti default, crea utente admin
+npm run dev       # con nodemon (riavvio automatico)
+# oppure: npm start
 ```
 
-### View Logs
+`npm run migrate` è **idempotente**: rieseguirlo su un database già popolato non sovrascrive contenuti che lo staff ha già modificato dal CMS (usa `INSERT IGNORE` e aggiornamenti con guardia sul valore precedente).
 
-```bash
-# All services
-docker-compose logs -f
+## Come vengono servite le pagine del sito pubblico
 
-# Backend only
-docker-compose logs -f backend
+Il sito pubblico non è file statici: ogni richiesta a una pagina nota (`/`, `/eventi`, `/eventi/:slug`, ecc.) passa da `src/services/ssr.js`, che:
 
-# Database only
-docker-compose logs -f db
-```
+1. legge i contenuti correnti dal DB (`site_content`, `page_seo`)
+2. chiama il bundle SSR (`src/ssr/entry-server.mjs`, compilato da `website/`) per ottenere l'HTML della pagina
+3. assembla titolo, meta description, Open Graph, canonical e JSON-LD (Organization + Event) a partire dai dati reali
+4. mette in cache il risultato in memoria (`src/services/ssrCache.js`), invalidata automaticamente ogni volta che lo staff salva una modifica dal CMS
 
-## Troubleshooting
+URL non riconosciuti ricevono un **404 reale** (non la home con status 200). La sitemap (`/sitemap.xml`) è generata dinamicamente dalla stessa lista di rotte note + eventi presenti in DB.
 
-### Cannot connect to database
+## API
 
-```bash
-# Check if PostgreSQL is running
-docker-compose ps
+Tutte le route sono montate sotto `/api`.
 
-# Check database logs
-docker-compose logs db
+### Pubbliche
 
-# Restart database
-docker-compose restart db
-```
+| Metodo | Endpoint | Descrizione |
+|---|---|---|
+| `GET` | `/api/health` | Health check |
+| `POST` | `/api/subscribers` | Nuova richiesta di tesseramento (dal sito) |
+| `GET` | `/api/content` | Contenuti CMS di tutte le pagine (usato dal sito in SSR) |
+| `GET` | `/api/seo` | Meta SEO di tutte le pagine |
+| `POST` | `/api/auth/login` | Login staff, ritorna JWT |
 
-### Email not sending
+### Autenticate (header `Authorization: Bearer <token>`)
 
-- Verify EMAIL_USER and EMAIL_PASSWORD in `.env`
-- Check if Gmail App Password is correct
-- Check backend logs: `docker-compose logs backend`
-- Email service is optional - API will work without it
+| Metodo | Endpoint | Descrizione |
+|---|---|---|
+| `GET` | `/api/auth/me` | Utente corrente |
+| `POST` | `/api/auth/change-password` | Cambio password |
+| `GET` | `/api/content/meta` | Contenuti con metadati (per l'editor admin) |
+| `PUT` | `/api/content/:page` | Aggiorna i campi di una pagina (invalida la cache SSR) |
+| `PUT` | `/api/seo/:page` | Aggiorna titolo/descrizione/immagine SEO di una pagina |
+| `POST` | `/api/upload` | Upload immagine (jpg/png/gif/webp, max 5MB), ritorna un URL relativo `/uploads/...` |
+| `DELETE` | `/api/upload/:filename` | Rimuove un'immagine caricata |
+| `GET` `PUT` `DELETE` `POST` | `/api/subscribers/*` | CRUD iscritti, statistiche, ripristino (vedi `routes/subscribers.js`) |
 
-### Port already in use
+## Utente admin di default
 
-If ports 3001, 5432, or 8080 are already in use, edit `docker-compose.yml`:
+Creato al primo `npm run migrate`, da `ADMIN_EMAIL`/`ADMIN_PASSWORD` nel `.env` (default: `admin@ekidna.org` / `admin123`).
 
-```yaml
-services:
-  backend:
-    ports:
-      - "3002:3001"  # Change to 3002
-```
+⚠️ **Cambia la password subito dopo il primo deploy in produzione.**
 
-## Production Deployment
+## Deploy
 
-See [DEPLOYMENT.md](../DEPLOYMENT.md) for Hostinger VPS deployment instructions.
+Vedi [../DEPLOYMENT_HOSTINGER.md](../DEPLOYMENT_HOSTINGER.md).
 
-## Security Checklist
+## Checklist sicurezza pre-produzione
 
-Before deploying to production:
-
-- [ ] Change default admin password
-- [ ] Update JWT_SECRET to a strong random string
-- [ ] Update DB_PASSWORD to a strong password
-- [ ] Set NODE_ENV=production
-- [ ] Configure firewall rules
-- [ ] Enable HTTPS/SSL
-- [ ] Set up regular database backups
-- [ ] Review CORS settings
-
-## License
-
-MIT License - Ekidna APS
+- [ ] Password admin cambiata
+- [ ] `JWT_SECRET` impostato a una stringa lunga e random (non il default di sviluppo)
+- [ ] `SITE_URL` impostato al dominio reale
+- [ ] Backup del database prima di eseguire `npm run migrate` in produzione

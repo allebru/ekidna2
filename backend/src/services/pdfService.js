@@ -1,104 +1,92 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
+const fontkit = require('@pdf-lib/fontkit');
 
-class PDFService {
-  constructor() {
-    this.templatePath = path.join(__dirname, '../../..', 'pdf', 'tessera_ekidna.pdf');
-  }
+const ASSETS_DIR = path.join(__dirname, '../../assets');
+const TMP_DIR = path.join(__dirname, '../../tmp');
 
-  async generateMembershipCard(subscriberData) {
-    try {
-      const { name, serialNumber, year } = subscriberData;
+const TEMPLATE_PATH = path.join(ASSETS_DIR, 'TESSERA_ONLINE.pdf');
+const CARD_FONT_PATH = path.join(ASSETS_DIR, 'BethEllen-Regular.ttf');
 
-      if (!name || !serialNumber || !year) {
-        throw new Error('Missing required data: name, serialNumber, and year are required');
-      }
-
-      const templateBytes = await fs.readFile(this.templatePath);
-      const pdfDoc = await PDFDocument.load(templateBytes);
-
-      const pages = pdfDoc.getPages();
-      const firstPage = pages[0];
-      const { width, height } = firstPage.getSize();
-
-      const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const cursiveFont = await pdfDoc.embedFont(StandardFonts.TimesRomanItalic);
-
-      const textColor = rgb(0, 0, 0);
-
-      const POSITIONS = {
-        year: { x: 25.0, y: 132.3, fontSize: 8.0 },
-        number: { x: 60.0, y: 132.3, fontSize: 8.0 },
-        firstName: { x: 32.0, y: 45, fontSize: 12.0 },
-        lastName: { x: 102.0, y: 45, fontSize: 12.0 }
-      };
-
-      firstPage.drawText(String(year), {
-        x: POSITIONS.year.x,
-        y: POSITIONS.year.y,
-        size: POSITIONS.year.fontSize,
-        font: regularFont,
-        color: textColor,
-      });
-
-      const numberText = `N. ${String(serialNumber).padStart(5, '0')}`;
-      firstPage.drawText(numberText, {
-        x: POSITIONS.number.x,
-        y: POSITIONS.number.y,
-        size: POSITIONS.number.fontSize,
-        font: regularFont,
-        color: textColor,
-      });
-
-      const nameParts = name.trim().split(/\s+/);
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-
-      if (firstName) {
-        firstPage.drawText(firstName, {
-          x: POSITIONS.firstName.x,
-          y: POSITIONS.firstName.y,
-          size: POSITIONS.firstName.fontSize,
-          font: cursiveFont,
-          color: textColor,
-        });
-      }
-
-      if (lastName) {
-        firstPage.drawText(lastName, {
-          x: POSITIONS.lastName.x,
-          y: POSITIONS.lastName.y,
-          size: POSITIONS.lastName.fontSize,
-          font: cursiveFont,
-          color: textColor,
-        });
-      }
-
-      const pdfBytes = await pdfDoc.save();
-
-      console.log(`[PDFService] Generated membership card for ${name} (Serial: ${serialNumber}, Year: ${year})`);
-
-      return Buffer.from(pdfBytes);
-    } catch (error) {
-      console.error('[PDFService] Error generating membership card:', error);
-      throw new Error(`Failed to generate membership card: ${error.message}`);
-    }
-  }
-
-  async templateExists() {
-    try {
-      await fs.access(this.templatePath);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  getTemplatePath() {
-    return this.templatePath;
-  }
+function ensureTmpDir() {
+  if (!fs.existsSync(TMP_DIR)) fs.mkdirSync(TMP_DIR, { recursive: true });
 }
 
-const pdfService = new PDFService();
-module.exports = pdfService;
+/**
+ * Generate the membership card PDF for a subscriber.
+ *
+ * Replicates OLD_PROJECT/tools.py make_card():
+ *   can.setFontSize(8)
+ *   can.drawString(25, 131, year)      ← left of "n."
+ *   can.drawString(75, 131, card_n)    ← right of "n."
+ *   can.setFont("CardFont", 12)
+ *   can.drawString(35, 45, name)       ← name box
+ *
+ * Template page: 246.72 × 161.52 pt (landscape, origin bottom-left).
+ *
+ * @param {Object} p
+ * @param {string|number} p.cardNumber  card number string e.g. "O00001"
+ * @param {string} p.name              full name to print
+ * @param {number} [p.year]            subscription year (default: current)
+ * @returns {Promise<string>} absolute path to the generated PDF
+ */
+async function generateTessera({ cardNumber, name, year }) {
+  ensureTmpDir();
+
+  const subscriptionYear = String(year || new Date().getFullYear());
+  const filePath = path.join(TMP_DIR, `TESSERA_ONLINE_${cardNumber}.pdf`);
+
+  // Load template
+  const templateBytes = fs.readFileSync(TEMPLATE_PATH);
+  const pdfDoc = await PDFDocument.load(templateBytes);
+
+  // Register fontkit so we can embed custom TTF fonts
+  pdfDoc.registerFontkit(fontkit);
+
+  // Embed fonts
+  const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const cardFontBytes = fs.readFileSync(CARD_FONT_PATH);
+  const cardFont = await pdfDoc.embedFont(cardFontBytes);
+
+  const page = pdfDoc.getPages()[0];
+  const { height } = page.getSize();
+
+  // Helper: convert reportlab y (from bottom) → pdf-lib y (from bottom — same!)
+  // pdf-lib uses the same bottom-left origin as reportlab, so no conversion needed.
+  const y = (rlY) => rlY;
+
+  // Year (left of "n.") — Helvetica 8pt, black
+  page.drawText(subscriptionYear, {
+    x: 25,
+    y: y(131),
+    size: 8,
+    font: helvetica,
+    color: rgb(0, 0, 0),
+  });
+
+  // Card number (right of "n.") — Helvetica 8pt, black
+  page.drawText(String(cardNumber), {
+    x: 75,
+    y: y(131),
+    size: 8,
+    font: helvetica,
+    color: rgb(0, 0, 0),
+  });
+
+  // Name — BethEllen 12pt, black
+  page.drawText(name || '', {
+    x: 35,
+    y: y(45),
+    size: 12,
+    font: cardFont,
+    color: rgb(0, 0, 0),
+  });
+
+  const pdfBytes = await pdfDoc.save();
+  fs.writeFileSync(filePath, pdfBytes);
+
+  return filePath;
+}
+
+module.exports = { generateTessera, TMP_DIR };

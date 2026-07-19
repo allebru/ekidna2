@@ -1,5 +1,8 @@
-import { Layout } from './layout/Layout';
+import { useState } from 'react';
+import { Layout, type DashboardSection } from './layout/Layout';
 import { SubscribersPage } from '../pages/SubscribersPage';
+import { ContentPage } from '../pages/ContentPage';
+import { SeoEditor } from '../pages/SeoEditor';
 
 interface DashboardProps {
   accessToken: string;
@@ -7,12 +10,13 @@ interface DashboardProps {
 }
 
 export function Dashboard({ accessToken, onLogout }: DashboardProps) {
-  // In the future, you can add routing here to switch between different pages
-  // For now, we just show the SubscribersPage
-  
+  const [section, setSection] = useState<DashboardSection>('iscritti');
+
   return (
-    <Layout onLogout={onLogout}>
-      <SubscribersPage accessToken={accessToken} />
+    <Layout onLogout={onLogout} section={section} onSectionChange={setSection}>
+      {section === 'iscritti' && <SubscribersPage accessToken={accessToken} />}
+      {section === 'contenuti' && <ContentPage />}
+      {section === 'seo' && <SeoEditor />}
     </Layout>
   );
 }

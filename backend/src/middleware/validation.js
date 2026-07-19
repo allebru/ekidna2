@@ -16,6 +16,14 @@ const validateSubscriber = [
     .notEmpty().withMessage('Name is required')
     .isLength({ min: 2, max: 255 }).withMessage('Name must be between 2 and 255 characters'),
 
+  body('first_name').optional({ checkFalsy: true }).trim().isLength({ max: 100 }).withMessage('First name too long'),
+  body('last_name').optional({ checkFalsy: true }).trim().isLength({ max: 100 }).withMessage('Last name too long'),
+  body('birth_date').optional({ checkFalsy: true }).isISO8601().withMessage('Invalid birth date'),
+  body('birth_place').optional({ checkFalsy: true }).trim().isLength({ max: 150 }).withMessage('Birth place too long'),
+  body('city').optional({ checkFalsy: true }).trim().isLength({ max: 100 }).withMessage('City too long'),
+  body('province').optional({ checkFalsy: true }).trim().isLength({ max: 4 }).withMessage('Invalid province'),
+  body('postal_code').optional({ checkFalsy: true }).trim().isLength({ max: 10 }).withMessage('Invalid postal code'),
+
   body('email')
     .optional({ checkFalsy: true })
     .trim()
@@ -59,11 +67,11 @@ const validateLogin = [
   handleValidationErrors
 ];
 
-// Validation rules for UUID parameters
-const validateUUID = [
+// Validation rules for ID parameters (gli ID sono interi auto-increment, NON UUID)
+const validateId = [
   param('id')
     .notEmpty().withMessage('ID is required')
-    .isUUID().withMessage('Invalid ID format'),
+    .isInt({ min: 1 }).withMessage('Invalid ID format'),
 
   handleValidationErrors
 ];
@@ -76,11 +84,11 @@ const validateQueryParams = [
 
   query('limit')
     .optional()
-    .isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+    .isInt({ min: 1, max: 1000 }).withMessage('Limit must be between 1 and 1000'),
 
   query('status')
     .optional()
-    .isIn(['active', 'deleted', 'pending']).withMessage('Invalid status'),
+    .isIn(['active', 'deleted', 'pending', 'all']).withMessage('Invalid status'),
 
   query('subscription_year')
     .optional()
@@ -92,7 +100,7 @@ const validateQueryParams = [
 module.exports = {
   validateSubscriber,
   validateLogin,
-  validateUUID,
+  validateId,
   validateQueryParams,
   handleValidationErrors
 };

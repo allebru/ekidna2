@@ -1,10 +1,15 @@
 
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
+  import tailwindcss from '@tailwindcss/vite';
   import path from 'path';
 
-  export default defineConfig({
-    plugins: [react()],
+  export default defineConfig(({ isSsrBuild }) => ({
+    plugins: [react(), tailwindcss()],
+    // La build SSR non deve copiare website/public/* (immagini, robots.txt...):
+    // servono solo nella build client (backend/public/site), non nel bundle
+    // Node importato da backend/src/services/ssr.js.
+    publicDir: isSsrBuild ? false : undefined,
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
@@ -20,7 +25,6 @@
         'embla-carousel-react@8.6.0': 'embla-carousel-react',
         'cmdk@1.1.1': 'cmdk',
         'class-variance-authority@0.7.1': 'class-variance-authority',
-        '@supabase/supabase-js@2': '@supabase/supabase-js',
         '@radix-ui/react-tooltip@1.1.8': '@radix-ui/react-tooltip',
         '@radix-ui/react-toggle@1.1.2': '@radix-ui/react-toggle',
         '@radix-ui/react-toggle-group@1.1.2': '@radix-ui/react-toggle-group',
@@ -47,16 +51,51 @@
         '@radix-ui/react-aspect-ratio@1.1.2': '@radix-ui/react-aspect-ratio',
         '@radix-ui/react-alert-dialog@1.1.6': '@radix-ui/react-alert-dialog',
         '@radix-ui/react-accordion@1.2.3': '@radix-ui/react-accordion',
-        '@jsr/supabase__supabase-js@2.49.8': '@jsr/supabase__supabase-js',
         '@': path.resolve(__dirname, './src'),
       },
     },
-    build: {
-      target: 'esnext',
-      outDir: 'build',
-    },
+    ssr: isSsrBuild
+      ? {
+          // Il "server" che consuma questo bundle è backend/, un progetto npm
+          // separato senza react nei suoi node_modules: bundlizziamo tutto
+          // (react incluso) invece di lasciare gli import esterni.
+          noExternal: true,
+        }
+      : undefined,
+    build: isSsrBuild
+      ? {
+          // Bundle SSR: importato dinamicamente dal backend (backend/src/services/ssr.js)
+          // per renderToString() ad ogni richiesta pagina.
+          target: 'node18',
+          outDir: '../backend/src/ssr',
+          emptyOutDir: true,
+          rollupOptions: {
+            output: { entryFileNames: 'entry-server.mjs', format: 'es' },
+          },
+        }
+      : {
+          target: 'esnext',
+          // Compilato dentro il backend: Express serve il sito pubblico alla root
+          outDir: '../backend/public/site',
+          emptyOutDir: true,
+        },
     server: {
       port: 3000,
       open: true,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+        },
+      },
     },
-  });
+    preview: {
+      port: 4173,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+        },
+      },
+    },
+  }));
